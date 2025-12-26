@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # API Backend
+  api:
+    build:
+      context: ../../apps/api
+      dockerfile: Dockerfile
+    ports:
+      - "5215:5215"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5215
+      - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=dawning_generator;User=root;Password=root123;
+    depends_on:
+      - mysql
+    networks:
+      - dawning-network
+
+  # Web Frontend
+  web:
+    build:
+      context: ../../apps/web
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+    networks:
+      - dawning-network
+
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root123
+      - MYSQL_DATABASE=dawning_generator
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - dawning-network
+
+networks:
+  dawning-network:
+    driver: bridge
+
+volumes:
+  mysql_data:

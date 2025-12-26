@@ -1,0 +1,7 @@
+<Project>
+  <!-- 覆盖全局 C:\github\Directory.Build.targets 设置 -->
+  <PropertyGroup>
+    <UseArtifactsOutput>false</UseArtifactsOutput>
+    <ArtifactsPath></ArtifactsPath>
+  </PropertyGroup>
+</Project>

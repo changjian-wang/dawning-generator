@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>{{dotnet_version}}</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\{{project_name}}.Domain\{{project_name}}.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+{{~ if database_type == "MySQL" ~}}
+    <PackageReference Include="MySqlConnector" Version="2.3.5" />
+{{~ else if database_type == "PostgreSQL" ~}}
+    <PackageReference Include="Npgsql" Version="8.0.2" />
+{{~ else if database_type == "SqlServer" ~}}
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
+{{~ else ~}}
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0" />
+{{~ end ~}}
+    <PackageReference Include="Dapper" Version="2.1.28" />
+    <PackageReference Include="Dapper.Contrib" Version="2.0.78" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,16 @@
+export default {
+  'favorites.title': '收藏模板',
+  'favorites.description': '保存常用的项目配置模板',
+  'favorites.name': '模板名称',
+  'favorites.namePlaceholder': '输入模板名称',
+  'favorites.templateDescription': '描述',
+  'favorites.descriptionPlaceholder': '输入模板描述',
+  'favorites.setDefault': '设为默认',
+  'favorites.useTemplate': '使用模板',
+  'favorites.edit': '编辑',
+  'favorites.delete': '删除',
+  'favorites.addNew': '添加收藏',
+  'favorites.saveSuccess': '保存成功',
+  'favorites.deleteSuccess': '删除成功',
+  'favorites.noFavorites': '暂无收藏模板',
+}

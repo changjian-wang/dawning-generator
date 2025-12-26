@@ -1,0 +1,68 @@
+# {{ project_name }}
+
+> 基于 Dawning SDK 构建的 .NET 微服务项目
+
+## 🚀 快速开始
+
+### 环境要求
+
+- .NET SDK {{ dotnet_version }}
+- {{ database_type | string.capitalize }} 数据库
+
+### 运行项目
+
+```bash
+# 还原依赖
+dotnet restore
+
+# 运行项目
+dotnet run --project src/{{ project_name }}.Api
+```
+
+### 访问地址
+
+- API: http://localhost:{{ service_port }}
+{{ if include_swagger }}- Swagger: http://localhost:{{ service_port }}/swagger{{ end }}
+{{ if include_health_checks }}- 健康检查: http://localhost:{{ service_port }}/api/health{{ end }}
+
+## 📁 项目结构
+
+```
+{{ project_name }}/
+├── src/
+│   ├── {{ project_name }}.Api/              # Web API 项目
+│   ├── {{ project_name }}.Application/      # 应用层
+│   ├── {{ project_name }}.Domain/           # 领域层
+│   └── {{ project_name }}.Infrastructure/   # 基础设施层
+{{ if include_tests }}├── tests/
+│   └── {{ project_name }}.Tests/            # 单元测试{{ end }}
+{{ if include_docker }}├── Dockerfile{{ end }}
+└── README.md
+```
+
+## 🔧 配置
+
+### 数据库连接
+
+修改 `appsettings.json` 中的连接字符串：
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "{{ connection_string }}"
+  }
+}
+```
+
+## 📦 已集成模块
+
+{{ if use_identity }}- ✅ Dawning.Identity - JWT 认证{{ end }}
+{{ if use_core }}- ✅ Dawning.Core - 统一响应/异常处理{{ end }}
+{{ if use_logging }}- ✅ Dawning.Logging - Serilog 日志{{ end }}
+{{ if use_dapper }}- ✅ Dawning.ORM.Dapper - 数据访问{{ end }}
+{{ if use_caching }}- ✅ Dawning.Caching - Redis 缓存{{ end }}
+{{ if use_resilience }}- ✅ Dawning.Resilience - 熔断重试{{ end }}
+
+---
+
+*生成时间: {{ generated_at }}*

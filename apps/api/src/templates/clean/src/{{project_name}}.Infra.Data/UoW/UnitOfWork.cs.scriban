@@ -1,0 +1,84 @@
+using System.Data;
+using {{namespace}}.Domain.Interfaces.Repositories;
+using {{namespace}}.Domain.Interfaces.UoW;
+{{~ if database_type == "MySQL" ~}}
+using MySqlConnector;
+{{~ else if database_type == "PostgreSQL" ~}}
+using Npgsql;
+{{~ else if database_type == "SqlServer" ~}}
+using Microsoft.Data.SqlClient;
+{{~ else ~}}
+using Microsoft.Data.Sqlite;
+{{~ end ~}}
+
+namespace {{namespace}}.Infra.Data.UoW;
+
+/// <summary>
+/// 工作单元实现
+/// </summary>
+public class UnitOfWork : IUnitOfWork
+{
+    private readonly IDbConnection _connection;
+    private IDbTransaction? _transaction;
+    private bool _disposed;
+
+    public ISampleRepository Sample { get; }
+
+    public UnitOfWork(string connectionString, ISampleRepository sampleRepository)
+    {
+{{~ if database_type == "MySQL" ~}}
+        _connection = new MySqlConnection(connectionString);
+{{~ else if database_type == "PostgreSQL" ~}}
+        _connection = new NpgsqlConnection(connectionString);
+{{~ else if database_type == "SqlServer" ~}}
+        _connection = new SqlConnection(connectionString);
+{{~ else ~}}
+        _connection = new SqliteConnection(connectionString);
+{{~ end ~}}
+        _connection.Open();
+        
+        Sample = sampleRepository;
+    }
+
+    public async Task BeginTransactionAsync()
+    {
+        if (_transaction == null)
+        {
+            _transaction = _connection.BeginTransaction();
+        }
+        await Task.CompletedTask;
+    }
+
+    public async Task CommitAsync()
+    {
+        _transaction?.Commit();
+        _transaction = null;
+        await Task.CompletedTask;
+    }
+
+    public async Task RollbackAsync()
+    {
+        _transaction?.Rollback();
+        _transaction = null;
+        await Task.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _transaction?.Dispose();
+                _connection.Dispose();
+            }
+            _disposed = true;
+        }
+    }
+}

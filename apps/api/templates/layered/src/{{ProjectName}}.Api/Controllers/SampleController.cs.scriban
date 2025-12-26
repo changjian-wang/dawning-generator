@@ -1,0 +1,54 @@
+{{ if use_core }}using Dawning.Core.Models;{{ end }}
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace {{ full_namespace }}.Api.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class SampleController : ControllerBase
+{
+    private readonly ILogger<SampleController> _logger;
+
+    public SampleController(ILogger<SampleController> logger)
+    {
+        _logger = logger;
+    }
+
+    /// <summary>
+    /// 获取示例数据
+    /// </summary>
+    [HttpGet]
+{{ if use_core }}
+    public ApiResponse<IEnumerable<string>> Get()
+    {
+        _logger.LogInformation("获取示例数据");
+        return ApiResponse<IEnumerable<string>>.Success(new[] { "Item1", "Item2", "Item3" });
+    }
+{{ else }}
+    public IActionResult Get()
+    {
+        _logger.LogInformation("获取示例数据");
+        return Ok(new[] { "Item1", "Item2", "Item3" });
+    }
+{{ end }}
+
+    /// <summary>
+    /// 获取单个示例 (需要认证)
+    /// </summary>
+    [HttpGet("{id}")]
+{{ if use_identity }}    [Authorize]{{ end }}
+{{ if use_core }}
+    public ApiResponse<object> GetById(int id)
+    {
+        _logger.LogInformation("获取示例数据: {Id}", id);
+        return ApiResponse<object>.Success(new { Id = id, Name = $"Sample {id}" });
+    }
+{{ else }}
+    public IActionResult GetById(int id)
+    {
+        _logger.LogInformation("获取示例数据: {Id}", id);
+        return Ok(new { Id = id, Name = $"Sample {id}" });
+    }
+{{ end }}
+}

@@ -1,0 +1,46 @@
+using AutoMapper;
+using {{namespace}}.Domain.Aggregates;
+using {{namespace}}.Infra.Data.PersistentObjects;
+
+namespace {{namespace}}.Infra.Data.Mapping;
+
+/// <summary>
+/// 示例映射配置
+/// </summary>
+public class SampleProfile : Profile
+{
+    public SampleProfile()
+    {
+        CreateMap<SampleEntity, Sample>().ReverseMap();
+    }
+}
+
+/// <summary>
+/// 示例映射器扩展
+/// </summary>
+public static class SampleMappers
+{
+    private static IMapper Mapper { get; }
+
+    static SampleMappers()
+    {
+        Mapper = new MapperConfiguration(cfg =>
+            cfg.AddProfile<SampleProfile>()
+        ).CreateMapper();
+    }
+
+    public static Sample? ToModel(this SampleEntity? entity)
+    {
+        return entity == null ? null : Mapper.Map<Sample>(entity);
+    }
+
+    public static IEnumerable<Sample>? ToModels(this IEnumerable<SampleEntity>? entities)
+    {
+        return entities == null ? null : Mapper.Map<IEnumerable<Sample>>(entities);
+    }
+
+    public static SampleEntity? ToEntity(this Sample? model)
+    {
+        return model == null ? null : Mapper.Map<SampleEntity>(model);
+    }
+}

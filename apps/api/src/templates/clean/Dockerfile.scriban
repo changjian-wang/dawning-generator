@@ -1,0 +1,43 @@
+{{~ if include_docker ~}}
+# 构建阶段
+FROM mcr.microsoft.com/dotnet/sdk:{{dotnet_version | string.replace "net" "" | string.replace ".0" ""}}.0 AS build
+WORKDIR /src
+
+# 复制项目文件
+COPY ["src/{{project_name}}.Api/{{project_name}}.Api.csproj", "src/{{project_name}}.Api/"]
+COPY ["src/{{project_name}}.Application/{{project_name}}.Application.csproj", "src/{{project_name}}.Application/"]
+COPY ["src/{{project_name}}.Domain/{{project_name}}.Domain.csproj", "src/{{project_name}}.Domain/"]
+COPY ["src/{{project_name}}.Domain.Core/{{project_name}}.Domain.Core.csproj", "src/{{project_name}}.Domain.Core/"]
+COPY ["src/{{project_name}}.Infra.Data/{{project_name}}.Infra.Data.csproj", "src/{{project_name}}.Infra.Data/"]
+COPY ["src/{{project_name}}.Infra.CrossCutting.IoC/{{project_name}}.Infra.CrossCutting.IoC.csproj", "src/{{project_name}}.Infra.CrossCutting.IoC/"]
+
+# 还原 NuGet 包
+RUN dotnet restore "src/{{project_name}}.Api/{{project_name}}.Api.csproj"
+
+# 复制源代码
+COPY . .
+
+# 构建项目
+WORKDIR "/src/src/{{project_name}}.Api"
+RUN dotnet build "{{project_name}}.Api.csproj" -c Release -o /app/build
+
+# 发布阶段
+FROM build AS publish
+RUN dotnet publish "{{project_name}}.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+# 运行时阶段
+FROM mcr.microsoft.com/dotnet/aspnet:{{dotnet_version | string.replace "net" "" | string.replace ".0" ""}}.0 AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+
+# 环境变量
+ENV ASPNETCORE_URLS=http://+:80
+ENV ASPNETCORE_ENVIRONMENT=Production
+
+EXPOSE 80
+
+ENTRYPOINT ["dotnet", "{{project_name}}.Api.dll"]
+{{~ else ~}}
+# Dockerfile 未启用
+# 在项目配置中启用 Docker 支持后生成此文件
+{{~ end ~}}

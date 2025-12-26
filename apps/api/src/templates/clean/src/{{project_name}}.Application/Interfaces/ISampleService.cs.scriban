@@ -1,0 +1,40 @@
+using {{namespace}}.Application.Dtos;
+using {{namespace}}.Domain.Models;
+
+namespace {{namespace}}.Application.Interfaces;
+
+/// <summary>
+/// 示例服务接口
+/// </summary>
+public interface ISampleService
+{
+    /// <summary>
+    /// 获取详情
+    /// </summary>
+    Task<SampleDto?> GetAsync(Guid id);
+    
+    /// <summary>
+    /// 获取分页列表
+    /// </summary>
+    Task<PagedData<SampleDto>> GetPagedListAsync(SampleQueryModel query, int page, int pageSize);
+    
+    /// <summary>
+    /// 获取所有
+    /// </summary>
+    Task<IEnumerable<SampleDto>?> GetAllAsync();
+    
+    /// <summary>
+    /// 新增
+    /// </summary>
+    ValueTask<int> InsertAsync(SampleDto dto);
+    
+    /// <summary>
+    /// 更新
+    /// </summary>
+    ValueTask<bool> UpdateAsync(SampleDto dto);
+    
+    /// <summary>
+    /// 删除
+    /// </summary>
+    ValueTask<bool> DeleteAsync(SampleDto dto);
+}

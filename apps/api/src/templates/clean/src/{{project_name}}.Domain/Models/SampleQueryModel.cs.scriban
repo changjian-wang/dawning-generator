@@ -1,0 +1,17 @@
+namespace {{namespace}}.Domain.Models;
+
+/// <summary>
+/// 示例查询模型
+/// </summary>
+public class SampleQueryModel
+{
+    /// <summary>
+    /// 名称（模糊查询）
+    /// </summary>
+    public string? Name { get; set; }
+    
+    /// <summary>
+    /// 状态
+    /// </summary>
+    public bool? IsActive { get; set; }
+}

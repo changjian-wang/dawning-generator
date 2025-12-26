@@ -1,0 +1,66 @@
+{{ if use_identity }}using Dawning.Identity.Extensions;{{ end }}
+{{ if use_core }}using Dawning.Core.Extensions;{{ end }}
+{{ if use_logging }}using Dawning.Logging.Extensions;{{ end }}
+{{ if include_swagger }}using Microsoft.OpenApi.Models;{{ end }}
+using {{ full_namespace }}.Application;
+using {{ full_namespace }}.Infrastructure;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddControllers();
+{{ if use_core }}builder.Services.AddDawningCore();{{ end }}
+
+{{ if include_swagger }}
+// Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "{{ project_name }} API",
+        Version = "v1"
+    });
+});
+{{ end }}
+
+{{ if use_identity }}
+// Authentication
+builder.Services.AddDawningAuthentication(builder.Configuration);
+{{ end }}
+
+{{ if use_logging }}
+// Logging
+builder.Host.UseDawningSerilog();
+{{ end }}
+
+{{ if include_health_checks }}
+// Health Checks
+builder.Services.AddHealthChecks()
+    .AddMySql(builder.Configuration.GetConnectionString("DefaultConnection")!);
+{{ end }}
+
+// Application & Infrastructure
+builder.Services.AddApplication(builder.Configuration);
+builder.Services.AddInfrastructure();
+
+var app = builder.Build();
+
+{{ if include_swagger }}
+// Swagger (only in Development)
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+{{ end }}
+
+{{ if use_core }}app.UseDawningExceptionHandler();{{ end }}
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+{{ if include_health_checks }}app.MapHealthChecks("/api/health");{{ end }}
+app.MapControllers();
+
+app.Run();

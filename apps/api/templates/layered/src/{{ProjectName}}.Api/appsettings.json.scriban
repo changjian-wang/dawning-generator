@@ -1,0 +1,26 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+{{ if use_identity }}
+  "DawningAuth": {
+    "Authority": "http://localhost:5202",
+    "Issuer": "http://localhost:5202",
+    "RequireHttpsMetadata": false
+  },
+{{ end }}
+  "ConnectionStrings": {
+    "DefaultConnection": "{{ connection_string }}"
+  },
+  "Kestrel": {
+    "Endpoints": {
+      "Http": {
+        "Url": "http://0.0.0.0:{{ service_port }}"
+      }
+    }
+  }
+}

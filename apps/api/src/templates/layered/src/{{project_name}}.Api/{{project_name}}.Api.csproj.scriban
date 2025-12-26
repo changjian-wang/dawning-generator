@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>{{dotnet_version}}</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\{{project_name}}.Application\{{project_name}}.Application.csproj" />
+    <ProjectReference Include="..\{{project_name}}.Infrastructure\{{project_name}}.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+{{~ if include_swagger ~}}
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+{{~ end ~}}
+{{~ if include_health_checks ~}}
+    <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="8.0.1" />
+{{~ end ~}}
+  </ItemGroup>
+
+</Project>

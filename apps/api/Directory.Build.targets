@@ -1,0 +1,8 @@
+<Project>
+  <!-- 覆盖全局设置，使用本地输出目录 -->
+  <PropertyGroup>
+    <!-- 禁用全局 artifacts 输出 -->
+    <UseArtifactsOutput>false</UseArtifactsOutput>
+    <ArtifactsPath></ArtifactsPath>
+  </PropertyGroup>
+</Project>

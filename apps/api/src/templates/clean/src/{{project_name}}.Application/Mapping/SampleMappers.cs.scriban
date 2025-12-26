@@ -1,0 +1,35 @@
+using AutoMapper;
+using {{namespace}}.Application.Dtos;
+using {{namespace}}.Domain.Aggregates;
+
+namespace {{namespace}}.Application.Mapping;
+
+/// <summary>
+/// 示例映射器扩展
+/// </summary>
+public static class SampleMappers
+{
+    private static IMapper Mapper { get; }
+
+    static SampleMappers()
+    {
+        Mapper = new MapperConfiguration(cfg =>
+            cfg.AddProfile<SampleProfile>()
+        ).CreateMapper();
+    }
+
+    public static SampleDto? ToDto(this Sample? model)
+    {
+        return model == null ? null : Mapper.Map<SampleDto>(model);
+    }
+
+    public static IEnumerable<SampleDto>? ToDtos(this IEnumerable<Sample>? models)
+    {
+        return models == null ? null : Mapper.Map<IEnumerable<SampleDto>>(models);
+    }
+
+    public static Sample? ToModel(this SampleDto? dto)
+    {
+        return dto == null ? null : Mapper.Map<Sample>(dto);
+    }
+}

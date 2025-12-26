@@ -1,0 +1,40 @@
+using {{namespace}}.Domain.Aggregates;
+using {{namespace}}.Domain.Models;
+
+namespace {{namespace}}.Domain.Interfaces.Repositories;
+
+/// <summary>
+/// 示例仓储接口
+/// </summary>
+public interface ISampleRepository
+{
+    /// <summary>
+    /// 获取详情
+    /// </summary>
+    Task<Sample?> GetAsync(Guid id);
+    
+    /// <summary>
+    /// 获取分页列表
+    /// </summary>
+    Task<PagedData<Sample>> GetPagedListAsync(SampleQueryModel query, int page, int pageSize);
+    
+    /// <summary>
+    /// 获取所有
+    /// </summary>
+    Task<IEnumerable<Sample>?> GetAllAsync();
+    
+    /// <summary>
+    /// 新增
+    /// </summary>
+    ValueTask<int> InsertAsync(Sample model);
+    
+    /// <summary>
+    /// 更新
+    /// </summary>
+    ValueTask<bool> UpdateAsync(Sample model);
+    
+    /// <summary>
+    /// 删除
+    /// </summary>
+    ValueTask<bool> DeleteAsync(Sample model);
+}

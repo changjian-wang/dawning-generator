@@ -1,0 +1,12 @@
+namespace {{namespace}}.Domain.Core.Interfaces;
+
+/// <summary>
+/// 聚合根接口
+/// </summary>
+public interface IAggregateRoot
+{
+    /// <summary>
+    /// 唯一标识
+    /// </summary>
+    Guid Id { get; set; }
+}

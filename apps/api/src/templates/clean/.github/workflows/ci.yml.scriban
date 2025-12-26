@@ -1,0 +1,61 @@
+{{~ if include_github_actions ~}}
+name: CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  DOTNET_VERSION: '{{dotnet_version | string.replace "net" "" | string.replace ".0" ""}}.x'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ "{{" }} env.DOTNET_VERSION {{ "}}" }}
+    
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --no-restore -c Release
+      
+    - name: Test
+      run: dotnet test --no-build -c Release --verbosity normal
+{{~ if include_docker ~}}
+
+  docker:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ "{{" }} secrets.DOCKER_USERNAME {{ "}}" }}
+        password: ${{ "{{" }} secrets.DOCKER_PASSWORD {{ "}}" }}
+    
+    - name: Build and push
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: |
+          ${{ "{{" }} secrets.DOCKER_USERNAME {{ "}}" }}/{{project_name | string.downcase}}:latest
+          ${{ "{{" }} secrets.DOCKER_USERNAME {{ "}}" }}/{{project_name | string.downcase}}:${{ "{{" }} github.sha {{ "}}" }}
+{{~ end ~}}
+{{~ else ~}}
+# GitHub Actions CI/CD 未启用
+# 在项目配置中启用 GitHub Actions 支持后生成此文件
+{{~ end ~}}

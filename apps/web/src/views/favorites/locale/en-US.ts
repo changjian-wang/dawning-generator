@@ -1,0 +1,16 @@
+export default {
+  'favorites.title': 'Favorite Templates',
+  'favorites.description': 'Save frequently used project configuration templates',
+  'favorites.name': 'Template Name',
+  'favorites.namePlaceholder': 'Enter template name',
+  'favorites.templateDescription': 'Description',
+  'favorites.descriptionPlaceholder': 'Enter template description',
+  'favorites.setDefault': 'Set as Default',
+  'favorites.useTemplate': 'Use Template',
+  'favorites.edit': 'Edit',
+  'favorites.delete': 'Delete',
+  'favorites.addNew': 'Add Favorite',
+  'favorites.saveSuccess': 'Saved successfully',
+  'favorites.deleteSuccess': 'Deleted successfully',
+  'favorites.noFavorites': 'No favorite templates',
+}

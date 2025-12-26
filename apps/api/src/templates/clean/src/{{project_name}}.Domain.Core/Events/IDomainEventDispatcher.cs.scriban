@@ -1,0 +1,12 @@
+namespace {{namespace}}.Domain.Core.Events;
+
+/// <summary>
+/// 领域事件分发器接口
+/// </summary>
+public interface IDomainEventDispatcher
+{
+    /// <summary>
+    /// 发布领域事件
+    /// </summary>
+    Task PublishAsync<TEvent>(TEvent domainEvent) where TEvent : DomainEvent;
+}

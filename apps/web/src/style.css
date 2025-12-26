@@ -1,0 +1,36 @@
+:root {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  min-height: 100vh;
+  background-color: #f2f3f5;
+  overflow-x: hidden;
+}
+
+#app {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* 隐藏 Arco Menu 的溢出滚动条 */
+.arco-menu-overflow-wrap {
+  overflow: hidden !important;
+}
+
+.arco-menu-inner {
+  overflow: hidden !important;
+}
+

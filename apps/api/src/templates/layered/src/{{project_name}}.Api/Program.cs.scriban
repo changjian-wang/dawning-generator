@@ -1,0 +1,45 @@
+using {{namespace}}.Application;
+using {{namespace}}.Infrastructure;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+{{~ if include_swagger ~}}
+builder.Services.AddSwaggerGen();
+{{~ end ~}}
+
+// Add Application layer
+builder.Services.AddApplication();
+
+// Add Infrastructure layer
+builder.Services.AddInfrastructure(builder.Configuration);
+
+{{~ if include_health_checks ~}}
+// Health Checks
+builder.Services.AddHealthChecks();
+{{~ end ~}}
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+{{~ if include_swagger ~}}
+    app.UseSwagger();
+    app.UseSwaggerUI();
+{{~ end ~}}
+}
+
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
+{{~ if include_health_checks ~}}
+app.MapHealthChecks("/health");
+{{~ end ~}}
+
+app.MapControllers();
+
+app.Run();

@@ -1,0 +1,53 @@
+using Microsoft.EntityFrameworkCore;
+using {{namespace}}.Data;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+{{~ if include_swagger ~}}
+builder.Services.AddSwaggerGen();
+{{~ end ~}}
+
+// Add DbContext
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+{{~ if database_type == "MySQL" ~}}
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+{{~ else if database_type == "PostgreSQL" ~}}
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(connectionString));
+{{~ else if database_type == "SqlServer" ~}}
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(connectionString));
+{{~ else ~}}
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlite(connectionString));
+{{~ end ~}}
+
+{{~ if include_health_checks ~}}
+builder.Services.AddHealthChecks();
+{{~ end ~}}
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+{{~ if include_swagger ~}}
+    app.UseSwagger();
+    app.UseSwaggerUI();
+{{~ end ~}}
+}
+
+app.UseHttpsRedirection();
+app.UseAuthorization();
+
+{{~ if include_health_checks ~}}
+app.MapHealthChecks("/health");
+{{~ end ~}}
+
+app.MapControllers();
+
+app.Run();

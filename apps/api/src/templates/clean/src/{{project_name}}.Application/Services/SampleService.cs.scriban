@@ -1,0 +1,78 @@
+using AutoMapper;
+using {{namespace}}.Application.Dtos;
+using {{namespace}}.Application.Interfaces;
+using {{namespace}}.Application.Mapping;
+using {{namespace}}.Domain.Aggregates;
+using {{namespace}}.Domain.Interfaces.Repositories;
+using {{namespace}}.Domain.Interfaces.UoW;
+using {{namespace}}.Domain.Models;
+
+namespace {{namespace}}.Application.Services;
+
+/// <summary>
+/// 示例服务实现
+/// </summary>
+public class SampleService : ISampleService
+{
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
+
+    public SampleService(IUnitOfWork unitOfWork, IMapper mapper)
+    {
+        _unitOfWork = unitOfWork;
+        _mapper = mapper;
+    }
+
+    public async Task<SampleDto?> GetAsync(Guid id)
+    {
+        var model = await _unitOfWork.Sample.GetAsync(id);
+        return model?.ToDto();
+    }
+
+    public async Task<PagedData<SampleDto>> GetPagedListAsync(SampleQueryModel query, int page, int pageSize)
+    {
+        var result = await _unitOfWork.Sample.GetPagedListAsync(query, page, pageSize);
+        return new PagedData<SampleDto>
+        {
+            Items = result.Items?.ToDtos()?.ToList() ?? new List<SampleDto>(),
+            Total = result.Total,
+            Page = result.Page,
+            PageSize = result.PageSize
+        };
+    }
+
+    public async Task<IEnumerable<SampleDto>?> GetAllAsync()
+    {
+        var models = await _unitOfWork.Sample.GetAllAsync();
+        return models?.ToDtos();
+    }
+
+    public async ValueTask<int> InsertAsync(SampleDto dto)
+    {
+        var model = dto.ToModel();
+        if (model == null) return 0;
+        
+        model.Id = Guid.NewGuid();
+        model.CreatedAt = DateTime.UtcNow;
+        
+        return await _unitOfWork.Sample.InsertAsync(model);
+    }
+
+    public async ValueTask<bool> UpdateAsync(SampleDto dto)
+    {
+        var model = dto.ToModel();
+        if (model == null) return false;
+        
+        model.UpdatedAt = DateTime.UtcNow;
+        
+        return await _unitOfWork.Sample.UpdateAsync(model);
+    }
+
+    public async ValueTask<bool> DeleteAsync(SampleDto dto)
+    {
+        var model = dto.ToModel();
+        if (model == null) return false;
+        
+        return await _unitOfWork.Sample.DeleteAsync(model);
+    }
+}

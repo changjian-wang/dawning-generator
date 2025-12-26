@@ -1,0 +1,99 @@
+using {{namespace}}.Application.Dtos;
+using {{namespace}}.Application.Interfaces;
+using {{namespace}}.Domain.Models;
+using Microsoft.AspNetCore.Mvc;
+
+namespace {{namespace}}.Api.Controllers;
+
+/// <summary>
+/// 示例控制器
+/// </summary>
+public class SampleController : ApiControllerBase
+{
+    private readonly ISampleService _sampleService;
+    private readonly ILogger<SampleController> _logger;
+
+    public SampleController(
+        ISampleService sampleService,
+        ILogger<SampleController> logger)
+    {
+        _sampleService = sampleService;
+        _logger = logger;
+    }
+
+    /// <summary>
+    /// 获取分页列表
+    /// </summary>
+    [HttpGet]
+    public async Task<IActionResult> GetPagedList(
+        [FromQuery] SampleQueryModel query,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
+    {
+        var result = await _sampleService.GetPagedListAsync(query, page, pageSize);
+        return PagedResult(result);
+    }
+
+    /// <summary>
+    /// 获取详情
+    /// </summary>
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> Get(Guid id)
+    {
+        var result = await _sampleService.GetAsync(id);
+        if (result == null)
+        {
+            return NotFound();
+        }
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// 创建
+    /// </summary>
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] SampleDto dto)
+    {
+        var result = await _sampleService.InsertAsync(dto);
+        if (result > 0)
+        {
+            return Success(message: "创建成功");
+        }
+        return Fail("创建失败");
+    }
+
+    /// <summary>
+    /// 更新
+    /// </summary>
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> Update(Guid id, [FromBody] SampleDto dto)
+    {
+        dto.Id = id;
+        var result = await _sampleService.UpdateAsync(dto);
+        if (result)
+        {
+            return Success(message: "更新成功");
+        }
+        return Fail("更新失败");
+    }
+
+    /// <summary>
+    /// 删除
+    /// </summary>
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var dto = await _sampleService.GetAsync(id);
+        if (dto == null)
+        {
+            return NotFound();
+        }
+        
+        var result = await _sampleService.DeleteAsync(dto);
+        if (result)
+        {
+            return Success(message: "删除成功");
+        }
+        return Fail("删除失败");
+    }
+}

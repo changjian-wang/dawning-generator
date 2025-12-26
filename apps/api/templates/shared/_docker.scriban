@@ -1,0 +1,23 @@
+FROM mcr.microsoft.com/dotnet/aspnet:{{ dotnet_version | string.replace "net" "" }} AS base
+WORKDIR /app
+EXPOSE {{ service_port }}
+
+FROM mcr.microsoft.com/dotnet/sdk:{{ dotnet_version | string.replace "net" "" }} AS build
+WORKDIR /src
+COPY ["src/{{ project_name }}.Api/{{ project_name }}.Api.csproj", "{{ project_name }}.Api/"]
+COPY ["src/{{ project_name }}.Application/{{ project_name }}.Application.csproj", "{{ project_name }}.Application/"]
+COPY ["src/{{ project_name }}.Domain/{{ project_name }}.Domain.csproj", "{{ project_name }}.Domain/"]
+COPY ["src/{{ project_name }}.Infrastructure/{{ project_name }}.Infrastructure.csproj", "{{ project_name }}.Infrastructure/"]
+RUN dotnet restore "{{ project_name }}.Api/{{ project_name }}.Api.csproj"
+COPY src/ .
+WORKDIR "/src/{{ project_name }}.Api"
+RUN dotnet build "{{ project_name }}.Api.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "{{ project_name }}.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENV ASPNETCORE_URLS=http://+:{{ service_port }}
+ENTRYPOINT ["dotnet", "{{ project_name }}.Api.dll"]

@@ -1,0 +1,16 @@
+using AutoMapper;
+using {{namespace}}.Application.Dtos;
+using {{namespace}}.Domain.Aggregates;
+
+namespace {{namespace}}.Application.Mapping;
+
+/// <summary>
+/// 示例映射配置
+/// </summary>
+public class SampleProfile : Profile
+{
+    public SampleProfile()
+    {
+        CreateMap<Sample, SampleDto>().ReverseMap();
+    }
+}

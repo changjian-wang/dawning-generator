@@ -1,0 +1,57 @@
+using {{namespace}}.Domain.Core.Interfaces;
+
+namespace {{namespace}}.Domain.Aggregates;
+
+/// <summary>
+/// 示例聚合根
+/// </summary>
+public class Sample : IAggregateRoot
+{
+    /// <summary>
+    /// 唯一标识
+    /// </summary>
+    public Guid Id { get; set; }
+    
+    /// <summary>
+    /// 名称
+    /// </summary>
+    public string Name { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// 描述
+    /// </summary>
+    public string? Description { get; set; }
+    
+    /// <summary>
+    /// 状态
+    /// </summary>
+    public bool IsActive { get; set; } = true;
+    
+    /// <summary>
+    /// 创建时间
+    /// </summary>
+    public DateTime CreatedAt { get; set; }
+    
+    /// <summary>
+    /// 更新时间
+    /// </summary>
+    public DateTime? UpdatedAt { get; set; }
+    
+    /// <summary>
+    /// 激活
+    /// </summary>
+    public void Activate()
+    {
+        IsActive = true;
+        UpdatedAt = DateTime.UtcNow;
+    }
+    
+    /// <summary>
+    /// 停用
+    /// </summary>
+    public void Deactivate()
+    {
+        IsActive = false;
+        UpdatedAt = DateTime.UtcNow;
+    }
+}
