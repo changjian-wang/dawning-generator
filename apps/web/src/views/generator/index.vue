@@ -181,7 +181,7 @@ const formData = reactive<GenerateProjectRequest>({
 const rules = {
   projectName: [
     { required: true, message: '请输入项目名称' },
-    { match: /^[a-zA-Z][a-zA-Z0-9]*$/, message: '项目名称只能包含字母和数字，且以字母开头' }
+    { match: /^[a-zA-Z][a-zA-Z0-9.]*[a-zA-Z0-9]$|^[a-zA-Z]$/, message: '项目名称只能包含字母、数字和点号，且以字母开头和字母/数字结尾' }
   ]
 }
 

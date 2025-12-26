@@ -1,4 +1,5 @@
 using System.Reflection;
+using AutoMapper;
 using {{namespace}}.Application.Interfaces;
 using {{namespace}}.Application.Mapping;
 using {{namespace}}.Application.Services;
@@ -26,8 +27,12 @@ public static class NativeInjectorBootStrapper
         var connectionString = configuration.GetConnectionString("DefaultConnection") 
             ?? throw new InvalidOperationException("Connection string not found");
         
-        // AutoMapper
-        services.AddAutoMapper(typeof(SampleProfile).Assembly);
+        // AutoMapper (13.x API)
+        var mapperConfig = new MapperConfiguration(cfg =>
+        {
+            cfg.AddMaps(typeof(SampleProfile).Assembly);
+        });
+        services.AddSingleton(mapperConfig.CreateMapper());
         
         // Repositories
         services.AddScoped<ISampleRepository>(sp => new SampleRepository(connectionString));
