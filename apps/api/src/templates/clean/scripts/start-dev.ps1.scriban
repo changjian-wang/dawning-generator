@@ -1,0 +1,137 @@
+# {{project_name}} 开发环境启动脚本 (Windows PowerShell)
+# 使用方法: .\scripts\start-dev.ps1
+
+$ErrorActionPreference = "Stop"
+
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "  {{project_name}} 开发环境启动脚本" -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host ""
+
+# 检查 Docker 是否安装
+Write-Host "[1/4] 检查 Docker..." -ForegroundColor Yellow
+$dockerVersion = docker --version 2>$null
+if (-not $dockerVersion) {
+    Write-Host "错误: Docker 未安装或未运行" -ForegroundColor Red
+    Write-Host "请先安装 Docker Desktop: https://www.docker.com/products/docker-desktop" -ForegroundColor Yellow
+    exit 1
+}
+Write-Host "  Docker 已安装: $dockerVersion" -ForegroundColor Green
+
+# 检查 Docker 是否正在运行
+Write-Host "[2/4] 检查 Docker 服务状态..." -ForegroundColor Yellow
+$dockerInfo = docker info 2>&1
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "错误: Docker 服务未运行" -ForegroundColor Red
+    Write-Host "请启动 Docker Desktop" -ForegroundColor Yellow
+    exit 1
+}
+Write-Host "  Docker 服务正在运行" -ForegroundColor Green
+
+# 启动 Docker Compose 服务
+Write-Host "[3/4] 启动数据库服务..." -ForegroundColor Yellow
+Push-Location $PSScriptRoot\..
+try {
+    docker-compose up -d
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "错误: Docker Compose 启动失败" -ForegroundColor Red
+        exit 1
+    }
+} finally {
+    Pop-Location
+}
+Write-Host "  数据库服务已启动" -ForegroundColor Green
+
+# 等待数据库就绪
+Write-Host "[4/4] 等待数据库就绪..." -ForegroundColor Yellow
+{{~ if database_type == "MySQL" ~}}
+$maxRetries = 30
+$retryCount = 0
+while ($retryCount -lt $maxRetries) {
+    $result = docker exec {{project_name | string.downcase}}-mysql mysqladmin ping -h localhost --silent 2>$null
+    if ($LASTEXITCODE -eq 0) {
+        break
+    }
+    $retryCount++
+    Write-Host "  等待 MySQL 启动... ($retryCount/$maxRetries)" -ForegroundColor Gray
+    Start-Sleep -Seconds 2
+}
+if ($retryCount -eq $maxRetries) {
+    Write-Host "警告: MySQL 可能未完全就绪，请稍后重试" -ForegroundColor Yellow
+} else {
+    Write-Host "  MySQL 已就绪" -ForegroundColor Green
+}
+{{~ else if database_type == "PostgreSQL" ~}}
+$maxRetries = 30
+$retryCount = 0
+while ($retryCount -lt $maxRetries) {
+    $result = docker exec {{project_name | string.downcase}}-postgres pg_isready -U postgres 2>$null
+    if ($LASTEXITCODE -eq 0) {
+        break
+    }
+    $retryCount++
+    Write-Host "  等待 PostgreSQL 启动... ($retryCount/$maxRetries)" -ForegroundColor Gray
+    Start-Sleep -Seconds 2
+}
+if ($retryCount -eq $maxRetries) {
+    Write-Host "警告: PostgreSQL 可能未完全就绪，请稍后重试" -ForegroundColor Yellow
+} else {
+    Write-Host "  PostgreSQL 已就绪" -ForegroundColor Green
+}
+{{~ else if database_type == "SqlServer" ~}}
+$maxRetries = 60
+$retryCount = 0
+while ($retryCount -lt $maxRetries) {
+    $result = docker exec {{project_name | string.downcase}}-sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "SqlServer@123456" -C -Q "SELECT 1" 2>$null
+    if ($LASTEXITCODE -eq 0) {
+        break
+    }
+    $retryCount++
+    Write-Host "  等待 SQL Server 启动... ($retryCount/$maxRetries)" -ForegroundColor Gray
+    Start-Sleep -Seconds 2
+}
+if ($retryCount -eq $maxRetries) {
+    Write-Host "警告: SQL Server 可能未完全就绪，请稍后重试" -ForegroundColor Yellow
+} else {
+    Write-Host "  SQL Server 已就绪" -ForegroundColor Green
+}
+{{~ else ~}}
+Write-Host "  SQLite 无需等待" -ForegroundColor Green
+{{~ end ~}}
+
+Write-Host ""
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "  开发环境已就绪!" -ForegroundColor Green
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "数据库连接信息:" -ForegroundColor Yellow
+{{~ if database_type == "MySQL" ~}}
+Write-Host "  类型: MySQL"
+Write-Host "  主机: localhost:3306"
+Write-Host "  数据库: {{project_name | string.downcase}}_db"
+Write-Host "  用户名: app_user"
+Write-Host "  密码: app123456"
+Write-Host "  Root密码: root123456"
+{{~ else if database_type == "PostgreSQL" ~}}
+Write-Host "  类型: PostgreSQL"
+Write-Host "  主机: localhost:5432"
+Write-Host "  数据库: {{project_name | string.downcase}}_db"
+Write-Host "  用户名: postgres"
+Write-Host "  密码: postgres123456"
+{{~ else if database_type == "SqlServer" ~}}
+Write-Host "  类型: SQL Server"
+Write-Host "  主机: localhost,1433"
+Write-Host "  用户名: sa"
+Write-Host "  密码: SqlServer@123456"
+{{~ else ~}}
+Write-Host "  类型: SQLite"
+Write-Host "  文件: ./{{project_name | string.downcase}}.db"
+{{~ end ~}}
+Write-Host ""
+Write-Host "启动 API 服务:" -ForegroundColor Yellow
+Write-Host "  cd src/{{project_name}}.Api"
+Write-Host "  dotnet run"
+Write-Host ""
+Write-Host "停止服务:" -ForegroundColor Yellow
+Write-Host "  docker-compose down"
+Write-Host ""

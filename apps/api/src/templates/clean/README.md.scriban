@@ -2,6 +2,37 @@
 
 基于 Dawning DDD 架构生成的项目
 
+## 快速开始
+
+### 一键启动开发环境
+
+**Windows (PowerShell):**
+```powershell
+.\scripts\start-dev.ps1
+```
+
+**Linux/macOS:**
+```bash
+chmod +x scripts/start-dev.sh
+./scripts/start-dev.sh
+```
+
+脚本会自动：
+1. 检查 Docker 是否安装并运行
+2. 启动数据库容器（{{database_type}}）
+3. 等待数据库就绪
+4. 显示连接信息
+
+### 停止开发环境
+
+```powershell
+# Windows
+.\scripts\stop-dev.ps1
+
+# Linux/macOS
+./scripts/stop-dev.sh
+```
+
 ## 项目结构
 
 ```
@@ -36,6 +67,14 @@ src/
 │
 └── {{project_name}}.Infra.CrossCutting.IoC/ # 基础设施-依赖注入
     └── NativeInjectorBootStrapper.cs        # DI 配置
+
+scripts/
+├── start-dev.ps1                            # Windows 启动脚本
+├── start-dev.sh                             # Linux/macOS 启动脚本
+├── stop-dev.ps1                             # Windows 停止脚本
+└── stop-dev.sh                              # Linux/macOS 停止脚本
+
+docker-compose.yml                           # Docker Compose 配置
 ```
 
 ## 技术栈
@@ -52,7 +91,40 @@ src/
 - **容器化**: Docker
 {{~ end ~}}
 
-## 开始使用
+## 数据库连接信息
+
+{{~ if database_type == "MySQL" ~}}
+| 配置项 | 值 |
+|--------|-----|
+| 类型 | MySQL 8.0 |
+| 主机 | localhost:3306 |
+| 数据库 | {{project_name | string.downcase}}_db |
+| 用户名 | app_user |
+| 密码 | app123456 |
+| Root密码 | root123456 |
+{{~ else if database_type == "PostgreSQL" ~}}
+| 配置项 | 值 |
+|--------|-----|
+| 类型 | PostgreSQL 16 |
+| 主机 | localhost:5432 |
+| 数据库 | {{project_name | string.downcase}}_db |
+| 用户名 | postgres |
+| 密码 | postgres123456 |
+{{~ else if database_type == "SqlServer" ~}}
+| 配置项 | 值 |
+|--------|-----|
+| 类型 | SQL Server 2022 |
+| 主机 | localhost,1433 |
+| 用户名 | sa |
+| 密码 | SqlServer@123456 |
+{{~ else ~}}
+| 配置项 | 值 |
+|--------|-----|
+| 类型 | SQLite |
+| 文件 | {{project_name | string.downcase}}.db |
+{{~ end ~}}
+
+## 手动配置（可选）
 
 ### 1. 配置数据库
 
