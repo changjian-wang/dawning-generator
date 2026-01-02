@@ -37,7 +37,26 @@
               </a-input>
             </a-form-item>
             
-            <a-form-item field="architectureType" :label="$t('generator.architectureType')" required>
+            <a-form-item field="projectType" :label="$t('generator.projectType')" required>
+              <a-radio-group v-model="formData.projectType" type="button" class="project-type-group">
+                <a-radio value="Backend">
+                  <icon-code /> {{ $t('generator.projectType.backend') }}
+                </a-radio>
+                <a-radio value="Frontend">
+                  <icon-desktop /> {{ $t('generator.projectType.frontend') }}
+                </a-radio>
+                <a-radio value="Fullstack">
+                  <icon-apps /> {{ $t('generator.projectType.fullstack') }}
+                </a-radio>
+              </a-radio-group>
+            </a-form-item>
+            
+            <a-form-item 
+              v-if="formData.projectType !== 'Frontend'"
+              field="architectureType" 
+              :label="$t('generator.architectureType')" 
+              required
+            >
               <a-radio-group v-model="formData.architectureType" direction="vertical" class="arch-radio-group">
                 <a-radio value="Layered">
                   <div class="arch-radio-content">
@@ -45,16 +64,38 @@
                     <span class="arch-desc">{{ $t('generator.architectureType.layeredDesc') }}</span>
                   </div>
                 </a-radio>
-                <a-radio value="Clean">
-                  <div class="arch-radio-content">
-                    <span class="arch-label">{{ $t('generator.architectureType.clean') }}</span>
-                    <span class="arch-desc">{{ $t('generator.architectureType.cleanDesc') }}</span>
-                  </div>
-                </a-radio>
                 <a-radio value="Simple">
                   <div class="arch-radio-content">
                     <span class="arch-label">{{ $t('generator.architectureType.simple') }}</span>
                     <span class="arch-desc">{{ $t('generator.architectureType.simpleDesc') }}</span>
+                  </div>
+                </a-radio>
+              </a-radio-group>
+            </a-form-item>
+            
+            <a-form-item 
+              v-if="formData.projectType !== 'Backend'"
+              field="frontendFramework" 
+              :label="$t('generator.frontendFramework')" 
+              required
+            >
+              <a-radio-group v-model="formData.frontendFramework" direction="vertical" class="arch-radio-group">
+                <a-radio value="VueArco">
+                  <div class="arch-radio-content">
+                    <span class="arch-label">Vue 3 + Arco Design</span>
+                    <span class="arch-desc">{{ $t('generator.frontendFramework.vueArcoDesc') }}</span>
+                  </div>
+                </a-radio>
+                <a-radio value="VueElement" disabled>
+                  <div class="arch-radio-content">
+                    <span class="arch-label">Vue 3 + Element Plus</span>
+                    <span class="arch-desc">{{ $t('generator.frontendFramework.comingSoon') }}</span>
+                  </div>
+                </a-radio>
+                <a-radio value="ReactAntd" disabled>
+                  <div class="arch-radio-content">
+                    <span class="arch-label">React + Ant Design</span>
+                    <span class="arch-desc">{{ $t('generator.frontendFramework.comingSoon') }}</span>
                   </div>
                 </a-radio>
               </a-radio-group>
@@ -72,14 +113,24 @@
               </div>
             </template>
             
-            <a-form-item field="dotNetVersion" :label="$t('generator.dotNetVersion')" required>
+            <a-form-item 
+              v-if="formData.projectType !== 'Frontend'"
+              field="dotNetVersion" 
+              :label="$t('generator.dotNetVersion')" 
+              required
+            >
               <a-radio-group v-model="formData.dotNetVersion" type="button">
                 <a-radio value="Net8">.NET 8 (LTS)</a-radio>
                 <a-radio value="Net9">.NET 9</a-radio>
               </a-radio-group>
             </a-form-item>
             
-            <a-form-item field="databaseType" :label="$t('generator.databaseType')" required>
+            <a-form-item 
+              v-if="formData.projectType !== 'Frontend'"
+              field="databaseType" 
+              :label="$t('generator.databaseType')" 
+              required
+            >
               <a-select v-model="formData.databaseType">
                 <a-option value="MySQL">MySQL</a-option>
                 <a-option value="PostgreSQL">PostgreSQL</a-option>
@@ -88,7 +139,11 @@
               </a-select>
             </a-form-item>
             
-            <a-form-item field="selectedModules" :label="$t('generator.modules')">
+            <a-form-item 
+              v-if="formData.projectType !== 'Frontend'"
+              field="selectedModules" 
+              :label="$t('generator.modules')"
+            >
               <a-checkbox-group v-model="formData.selectedModules" class="module-checkbox-group">
                 <a-row :gutter="[8, 8]">
                   <a-col :span="12">
@@ -107,7 +162,7 @@
                     <a-checkbox value="HealthCheck">{{ $t('generator.modules.healthCheck') }}</a-checkbox>
                   </a-col>
                   <a-col :span="12">
-                    <a-checkbox value="AutoMapper">{{ $t('generator.modules.autoMapper') }}</a-checkbox>
+                    <a-checkbox value="Dapper">Dapper ORM</a-checkbox>
                   </a-col>
                 </a-row>
               </a-checkbox-group>
@@ -129,10 +184,37 @@
                     {{ $t('generator.includeGitHubActions') }}
                   </a-space>
                 </a-checkbox>
-                <a-checkbox v-model="formData.includeUnitTests">
+                <a-checkbox 
+                  v-if="formData.projectType !== 'Frontend'"
+                  v-model="formData.includeUnitTests"
+                >
                   <a-space>
                     <icon-bug />
                     {{ $t('generator.includeUnitTests') }}
+                  </a-space>
+                </a-checkbox>
+                <a-checkbox 
+                  v-if="formData.projectType !== 'Frontend'"
+                  v-model="formData.useRedis"
+                >
+                  <a-space>
+                    <icon-storage />
+                    {{ $t('generator.useRedis') }}
+                  </a-space>
+                </a-checkbox>
+                <a-checkbox v-model="formData.useSignalR">
+                  <a-space>
+                    <icon-sync />
+                    {{ $t('generator.useSignalR') }}
+                  </a-space>
+                </a-checkbox>
+                <a-checkbox 
+                  v-if="formData.projectType !== 'Backend'"
+                  v-model="formData.useECharts"
+                >
+                  <a-space>
+                    <icon-bar-chart />
+                    {{ $t('generator.useECharts') }}
                   </a-space>
                 </a-checkbox>
               </a-space>
@@ -169,13 +251,20 @@ const loading = ref(false)
 const formData = reactive<GenerateProjectRequest>({
   projectName: '',
   namespacePrefix: '',
+  projectType: 'Backend',
   architectureType: 'Layered',
+  frontendFramework: 'VueArco',
   dotNetVersion: 'Net8',
   databaseType: 'MySQL',
   selectedModules: ['Authentication', 'Logging', 'Swagger'],
   includeDocker: true,
   includeGitHubActions: false,
-  includeUnitTests: true
+  includeUnitTests: true,
+  useRedis: false,
+  useSignalR: false,
+  useECharts: true,
+  servicePort: 5000,
+  frontendPort: 3000
 })
 
 const rules = {
@@ -216,13 +305,20 @@ const handleSubmit = async () => {
 const handleReset = () => {
   formData.projectName = ''
   formData.namespacePrefix = ''
+  formData.projectType = 'Backend'
   formData.architectureType = 'Layered'
+  formData.frontendFramework = 'VueArco'
   formData.dotNetVersion = 'Net8'
   formData.databaseType = 'MySQL'
   formData.selectedModules = ['Authentication', 'Logging', 'Swagger']
   formData.includeDocker = true
   formData.includeGitHubActions = false
   formData.includeUnitTests = true
+  formData.useRedis = false
+  formData.useSignalR = false
+  formData.useECharts = true
+  formData.servicePort = 5000
+  formData.frontendPort = 3000
 }
 </script>
 
@@ -256,6 +352,16 @@ const handleReset = () => {
   color: rgb(var(--primary-6));
 }
 
+/* 项目类型选择样式 */
+.project-type-group {
+  width: 100%;
+}
+
+.project-type-group :deep(.arco-radio-button) {
+  flex: 1;
+  text-align: center;
+}
+
 /* 架构选项样式 */
 .arch-radio-group {
   width: 100%;
@@ -277,6 +383,10 @@ const handleReset = () => {
 .arch-radio-group :deep(.arco-radio-checked) {
   border-color: rgb(var(--primary-6));
   background: var(--color-primary-light-1);
+}
+
+.arch-radio-group :deep(.arco-radio-disabled) {
+  opacity: 0.6;
 }
 
 .arch-radio-content {

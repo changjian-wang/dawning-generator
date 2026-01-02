@@ -1,22 +1,34 @@
 import request from './request'
 
+export type ProjectType = 'Backend' | 'Frontend' | 'Fullstack'
+export type FrontendFramework = 'VueArco' | 'VueElement' | 'ReactAntd'
+
 export interface GenerateProjectRequest {
   projectName: string
   namespacePrefix?: string
+  projectType: ProjectType
   architectureType: 'Layered' | 'Clean' | 'Simple'
+  frontendFramework: FrontendFramework
   dotNetVersion: 'Net8' | 'Net9'
   databaseType: 'MySQL' | 'PostgreSQL' | 'SqlServer' | 'SQLite'
   selectedModules: string[]
   includeDocker: boolean
   includeGitHubActions: boolean
   includeUnitTests: boolean
+  useRedis: boolean
+  useSignalR: boolean
+  useECharts: boolean
+  servicePort: number
+  frontendPort: number
 }
 
 // 后端 DTO 格式
 interface BackendGenerateRequest {
   projectName: string
   namespacePrefix?: string
+  projectType: string
   architectureType: string
+  frontendFramework: string
   dotNetVersion: string
   database: {
     type: string
@@ -28,7 +40,18 @@ interface BackendGenerateRequest {
     includeGitHubActions: boolean
     includeSwagger: boolean
     includeHealthChecks: boolean
+    useRedis: boolean
+    useSignalR: boolean
+    useOpenIddict: boolean
   }
+  frontend: {
+    useECharts: boolean
+    apiBaseUrl: string
+    useSignalR: boolean
+    appTitle: string
+  }
+  servicePort: number
+  frontendPort: number
 }
 
 export interface GenerateProjectResponse {
@@ -56,7 +79,9 @@ function transformRequest(data: GenerateProjectRequest): BackendGenerateRequest 
   return {
     projectName: data.projectName,
     namespacePrefix: data.namespacePrefix,
+    projectType: data.projectType,
     architectureType: data.architectureType,
+    frontendFramework: data.frontendFramework,
     dotNetVersion: data.dotNetVersion,
     database: {
       type: data.databaseType
@@ -67,8 +92,19 @@ function transformRequest(data: GenerateProjectRequest): BackendGenerateRequest 
       includeDocker: data.includeDocker,
       includeGitHubActions: data.includeGitHubActions,
       includeSwagger: data.selectedModules.includes('Swagger'),
-      includeHealthChecks: data.selectedModules.includes('HealthCheck')
-    }
+      includeHealthChecks: data.selectedModules.includes('HealthCheck'),
+      useRedis: data.useRedis,
+      useSignalR: data.useSignalR,
+      useOpenIddict: false
+    },
+    frontend: {
+      useECharts: data.useECharts,
+      apiBaseUrl: '/api',
+      useSignalR: data.useSignalR,
+      appTitle: data.projectName
+    },
+    servicePort: data.servicePort,
+    frontendPort: data.frontendPort
   }
 }
 

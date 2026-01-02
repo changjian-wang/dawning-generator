@@ -6,13 +6,20 @@ export const useGeneratorStore = defineStore('generator', () => {
   const currentConfig = ref<GenerateProjectRequest>({
     projectName: '',
     namespacePrefix: '',
+    projectType: 'Backend',
     architectureType: 'Layered',
+    frontendFramework: 'VueArco',
     dotNetVersion: 'Net8',
     databaseType: 'MySQL',
     selectedModules: ['Authentication', 'Logging'],
     includeDocker: true,
     includeGitHubActions: false,
-    includeUnitTests: true
+    includeUnitTests: true,
+    useRedis: false,
+    useSignalR: false,
+    useECharts: true,
+    servicePort: 5000,
+    frontendPort: 3000
   })
 
   const lastResult = ref<GenerateProjectResponse | null>(null)
@@ -30,13 +37,20 @@ export const useGeneratorStore = defineStore('generator', () => {
     currentConfig.value = {
       projectName: '',
       namespacePrefix: '',
+      projectType: 'Backend',
       architectureType: 'Layered',
+      frontendFramework: 'VueArco',
       dotNetVersion: 'Net8',
       databaseType: 'MySQL',
       selectedModules: ['Authentication', 'Logging'],
       includeDocker: true,
       includeGitHubActions: false,
-      includeUnitTests: true
+      includeUnitTests: true,
+      useRedis: false,
+      useSignalR: false,
+      useECharts: true,
+      servicePort: 5000,
+      frontendPort: 3000
     }
   }
 

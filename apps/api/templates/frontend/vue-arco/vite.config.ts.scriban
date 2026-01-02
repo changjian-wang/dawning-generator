@@ -1,0 +1,9 @@
+import { defineConfig } from 'vite';
+
+// Load different configurations based on mode
+export default defineConfig(({ mode }) => {
+  if (mode === 'development') {
+    return import('./config/vite.config.dev').then((m) => m.default);
+  }
+  return import('./config/vite.config.prod').then((m) => m.default);
+});
