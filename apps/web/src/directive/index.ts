@@ -1,8 +1,8 @@
-import { App } from 'vue'
+import type { App } from 'vue'
 
 // 权限指令
 const permission = {
-  mounted(el: HTMLElement, binding: { value: string[] }) {
+  mounted(_el: HTMLElement, binding: { value: string[] }) {
     const { value } = binding
     // 这里可以添加权限校验逻辑
     if (value && value.length > 0) {

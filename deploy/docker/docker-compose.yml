@@ -1,4 +1,4 @@
-version: '3.8'
+name: dawning-generator
 
 services:
   # API Backend
@@ -23,7 +23,7 @@ services:
       context: ../../apps/web
       dockerfile: Dockerfile
     ports:
-      - "3000:80"
+      - "3001:80"
     depends_on:
       - api
     networks:
@@ -33,7 +33,7 @@ services:
   mysql:
     image: mysql:8.0
     ports:
-      - "3306:3306"
+      - "3307:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=root123
       - MYSQL_DATABASE=dawning_generator

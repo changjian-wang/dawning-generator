@@ -8,22 +8,20 @@ WORKDIR /src
 
 # Copy solution and project files
 COPY ["Dawning.Generator.sln", "./"]
-COPY ["src/Dawning.Generator.Api/Dawning.Generator.Api.csproj", "src/Dawning.Generator.Api/"]
+COPY ["src/Dawning.Generator.Api.csproj", "src/"]
 COPY ["src/Dawning.Generator.Application/Dawning.Generator.Application.csproj", "src/Dawning.Generator.Application/"]
 COPY ["src/Dawning.Generator.Domain/Dawning.Generator.Domain.csproj", "src/Dawning.Generator.Domain/"]
 COPY ["src/Dawning.Generator.Infrastructure/Dawning.Generator.Infrastructure.csproj", "src/Dawning.Generator.Infrastructure/"]
 COPY ["nuget.config", "./"]
 
 # Restore dependencies
-ARG GITHUB_TOKEN
-RUN dotnet nuget update source github --username changjian-wang --password ${GITHUB_TOKEN} --store-password-in-clear-text || true
-RUN dotnet restore "src/Dawning.Generator.Api/Dawning.Generator.Api.csproj"
+RUN dotnet restore "src/Dawning.Generator.Api.csproj"
 
 # Copy all source code
 COPY . .
 
 # Build the application
-WORKDIR "/src/src/Dawning.Generator.Api"
+WORKDIR "/src/src"
 RUN dotnet build "Dawning.Generator.Api.csproj" -c Release -o /app/build
 
 # ===== Publish Stage =====
