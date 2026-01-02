@@ -18,9 +18,19 @@ public class GenerateProjectRequest
     public string? NamespacePrefix { get; set; }
     
     /// <summary>
-    /// 架构类型
+    /// 项目类型
+    /// </summary>
+    public ProjectType ProjectType { get; set; } = ProjectType.Backend;
+    
+    /// <summary>
+    /// 架构类型 (后端适用)
     /// </summary>
     public ArchitectureType ArchitectureType { get; set; } = ArchitectureType.Layered;
+    
+    /// <summary>
+    /// 前端框架 (前端/全栈适用)
+    /// </summary>
+    public FrontendFramework FrontendFramework { get; set; } = FrontendFramework.VueArco;
     
     /// <summary>
     /// .NET 版本
@@ -43,9 +53,19 @@ public class GenerateProjectRequest
     public FeatureOptions Features { get; set; } = new();
     
     /// <summary>
+    /// 前端配置 (前端/全栈适用)
+    /// </summary>
+    public FrontendConfig Frontend { get; set; } = new();
+    
+    /// <summary>
     /// 服务端口
     /// </summary>
     public int ServicePort { get; set; } = 5000;
+    
+    /// <summary>
+    /// 前端端口
+    /// </summary>
+    public int FrontendPort { get; set; } = 3000;
     
     /// <summary>
     /// 是否保存到历史记录
@@ -67,4 +87,33 @@ public class FeatureOptions
     public bool IncludeGitHubActions { get; set; } = false;
     public bool IncludeSwagger { get; set; } = true;
     public bool IncludeHealthChecks { get; set; } = true;
+    public bool UseRedis { get; set; } = false;
+    public bool UseSignalR { get; set; } = false;
+    public bool UseOpenIddict { get; set; } = false;
+}
+
+/// <summary>
+/// 前端配置
+/// </summary>
+public class FrontendConfig
+{
+    /// <summary>
+    /// 是否使用 ECharts 图表
+    /// </summary>
+    public bool UseECharts { get; set; } = true;
+    
+    /// <summary>
+    /// API 基础路径
+    /// </summary>
+    public string ApiBaseUrl { get; set; } = "/api";
+    
+    /// <summary>
+    /// 是否使用 SignalR (前端 WebSocket)
+    /// </summary>
+    public bool UseSignalR { get; set; } = false;
+    
+    /// <summary>
+    /// 应用标题
+    /// </summary>
+    public string AppTitle { get; set; } = "";
 }

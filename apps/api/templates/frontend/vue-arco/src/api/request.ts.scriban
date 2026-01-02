@@ -1,0 +1,102 @@
+import axios, { type AxiosRequestConfig, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
+import { Message } from '@arco-design/web-vue';
+import { useUserStore } from '@/store/user';
+import router from '@/router';
+
+const service = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+  timeout: 30000,
+});
+
+// Request interceptor
+service.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    const userStore = useUserStore();
+    if (userStore.token) {
+      config.headers.Authorization = `Bearer ${userStore.token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor
+service.interceptors.response.use(
+  (response: AxiosResponse) => {
+    const { data } = response;
+    
+    // If response is blob (file download), return directly
+    if (response.config.responseType === 'blob') {
+      return response;
+    }
+    
+    // Handle business logic errors
+    if (data.code && data.code !== 200) {
+      Message.error(data.message || 'Request failed');
+      return Promise.reject(new Error(data.message || 'Error'));
+    }
+    
+    return data;
+  },
+  (error) => {
+    const { response } = error;
+    
+    if (response) {
+      switch (response.status) {
+        case 401:
+          Message.error('Unauthorized, please login again');
+          const userStore = useUserStore();
+          userStore.logout();
+          router.push('/login');
+          break;
+        case 403:
+          Message.error('Access denied');
+          break;
+        case 404:
+          Message.error('Resource not found');
+          break;
+        case 500:
+          Message.error('Server error');
+          break;
+        default:
+          Message.error(response.data?.message || 'Request failed');
+      }
+    } else {
+      Message.error('Network error, please check your connection');
+    }
+    
+    return Promise.reject(error);
+  }
+);
+
+export interface ApiResponse<T = unknown> {
+  code: number;
+  message: string;
+  data: T;
+}
+
+export const request = {
+  get<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    return service.get(url, config);
+  },
+  
+  post<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    return service.post(url, data, config);
+  },
+  
+  put<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    return service.put(url, data, config);
+  },
+  
+  delete<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    return service.delete(url, config);
+  },
+  
+  patch<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    return service.patch(url, data, config);
+  },
+};
+
+export default service;

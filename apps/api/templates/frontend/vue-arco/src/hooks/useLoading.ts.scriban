@@ -1,0 +1,37 @@
+import { ref } from 'vue';
+
+export function useLoading(initValue = false) {
+  const loading = ref(initValue);
+
+  const setLoading = (value: boolean) => {
+    loading.value = value;
+  };
+
+  const toggle = () => {
+    loading.value = !loading.value;
+  };
+
+  return {
+    loading,
+    setLoading,
+    toggle,
+  };
+}
+
+export function useAsyncLoading<T extends (...args: unknown[]) => Promise<unknown>>(fn: T) {
+  const loading = ref(false);
+
+  const run = async (...args: Parameters<T>): Promise<ReturnType<T>> => {
+    loading.value = true;
+    try {
+      return await fn(...args) as ReturnType<T>;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  return {
+    loading,
+    run,
+  };
+}

@@ -1,0 +1,66 @@
+# {{ project_name }} Frontend
+
+基于 Vue 3 + TypeScript + Vite + Arco Design 的前端项目。
+
+## 技术栈
+
+- **框架**: Vue 3 (Composition API)
+- **构建工具**: Vite
+- **UI 组件库**: Arco Design Vue
+- **状态管理**: Pinia
+- **路由**: Vue Router 4
+- **HTTP 客户端**: Axios
+- **国际化**: Vue I18n
+{{~ if use_echarts ~}}
+- **图表**: ECharts
+{{~ end ~}}
+- **CSS 预处理**: Less
+
+## 项目结构
+
+```
+src/
+├── api/          # API 请求
+├── assets/       # 静态资源
+├── components/   # 公共组件
+├── hooks/        # 自定义 Hooks
+├── layout/       # 布局组件
+├── locale/       # 国际化
+├── router/       # 路由配置
+├── store/        # 状态管理
+├── utils/        # 工具函数
+└── views/        # 页面组件
+```
+
+## 开发
+
+```bash
+# 安装依赖
+pnpm install
+
+# 启动开发服务器
+pnpm dev
+
+# 构建生产版本
+pnpm build
+
+# 预览生产构建
+pnpm preview
+```
+
+## Docker 部署
+
+```bash
+# 构建镜像
+docker build -t {{ project_name | string.downcase }}-web .
+
+# 运行容器
+docker run -d -p 80:80 {{ project_name | string.downcase }}-web
+```
+
+## 环境变量
+
+| 变量 | 描述 | 默认值 |
+|------|------|--------|
+| `VITE_API_BASE_URL` | API 基础路径 | `/api` |
+| `VITE_APP_TITLE` | 应用标题 | `{{ project_name }}` |

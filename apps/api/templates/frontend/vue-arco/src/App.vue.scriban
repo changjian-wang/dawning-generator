@@ -1,0 +1,30 @@
+<template>
+  <a-config-provider :locale="locale">
+    <router-view />
+  </a-config-provider>
+</template>
+
+<script lang="ts" setup>
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import enUS from '@arco-design/web-vue/es/locale/lang/en-us';
+import zhCN from '@arco-design/web-vue/es/locale/lang/zh-cn';
+
+const { locale: i18nLocale } = useI18n();
+
+const locale = computed(() => {
+  switch (i18nLocale.value) {
+    case 'zh-CN':
+      return zhCN;
+    default:
+      return enUS;
+  }
+});
+</script>
+
+<style>
+#app {
+  width: 100%;
+  height: 100%;
+}
+</style>

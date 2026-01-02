@@ -36,52 +36,27 @@ public class ProjectGeneratorService : IProjectGeneratorService
     {
         try
         {
-            _logger.LogInformation("开始生成项目: {ProjectName}", request.ProjectName);
+            _logger.LogInformation("开始生成项目: {ProjectName}, 类型: {ProjectType}", request.ProjectName, request.ProjectType);
 
             // 构建模板上下文
             var context = BuildTemplateContext(request);
 
-            // 确定模板文件夹
-            var templateFolder = request.ArchitectureType switch
-            {
-                ArchitectureType.Layered => "layered",
-                ArchitectureType.Clean => "clean",
-                ArchitectureType.Simple => "simple",
-                _ => "layered"
-            };
-
-            // 获取所有模板文件
-            var templateFiles = _templateEngine.GetTemplateFiles(templateFolder).ToList();
-
-            if (templateFiles.Count == 0)
-            {
-                _logger.LogWarning("模板文件夹为空: {Folder}", templateFolder);
-                return new GenerateProjectResponse
-                {
-                    Success = false,
-                    ErrorMessage = $"No templates found in folder: {templateFolder}",
-                };
-            }
-
-            // 生成 ZIP
             using var memoryStream = new MemoryStream();
             using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
             {
-                foreach (var templateFile in templateFiles)
+                // 根据项目类型生成不同的内容
+                switch (request.ProjectType)
                 {
-                    var renderedContent = await _templateEngine.RenderAsync(templateFile, context);
-
-                    // 处理输出路径 (移除 .scriban 后缀，替换变量)
-                    var outputPath = ProcessOutputPath(templateFile, context, templateFolder);
-
-                    var entry = archive.CreateEntry(outputPath);
-                    await using var entryStream = entry.Open();
-                    await using var writer = new StreamWriter(entryStream);
-                    await writer.WriteAsync(renderedContent);
+                    case ProjectType.Backend:
+                        await GenerateBackendAsync(archive, request, context);
+                        break;
+                    case ProjectType.Frontend:
+                        await GenerateFrontendAsync(archive, request, context);
+                        break;
+                    case ProjectType.Fullstack:
+                        await GenerateFullstackAsync(archive, request, context);
+                        break;
                 }
-
-                // 添加共享文件
-                await AddSharedFilesAsync(archive, request, context);
             }
 
             memoryStream.Position = 0;
@@ -116,11 +91,139 @@ public class ProjectGeneratorService : IProjectGeneratorService
         }
     }
 
+    private async Task GenerateBackendAsync(ZipArchive archive, GenerateProjectRequest request, object context)
+    {
+        // 确定模板文件夹
+        var templateFolder = request.ArchitectureType switch
+        {
+            ArchitectureType.Layered => "layered",
+            ArchitectureType.Clean => "clean",
+            ArchitectureType.Simple => "simple",
+            _ => "layered"
+        };
+
+        // 获取所有模板文件
+        var templateFiles = _templateEngine.GetTemplateFiles(templateFolder).ToList();
+
+        if (templateFiles.Count == 0)
+        {
+            _logger.LogWarning("模板文件夹为空: {Folder}", templateFolder);
+            throw new InvalidOperationException($"No templates found in folder: {templateFolder}");
+        }
+
+        foreach (var templateFile in templateFiles)
+        {
+            var renderedContent = await _templateEngine.RenderAsync(templateFile, context);
+            var outputPath = ProcessOutputPath(templateFile, context, templateFolder);
+
+            var entry = archive.CreateEntry(outputPath);
+            await using var entryStream = entry.Open();
+            await using var writer = new StreamWriter(entryStream);
+            await writer.WriteAsync(renderedContent);
+        }
+
+        // 添加共享文件
+        await AddSharedFilesAsync(archive, request, context);
+    }
+
+    private async Task GenerateFrontendAsync(ZipArchive archive, GenerateProjectRequest request, object context)
+    {
+        // 确定前端模板文件夹
+        var templateFolder = request.FrontendFramework switch
+        {
+            FrontendFramework.VueArco => "frontend/vue-arco",
+            FrontendFramework.VueElement => "frontend/vue-element",
+            FrontendFramework.ReactAntd => "frontend/react-antd",
+            _ => "frontend/vue-arco"
+        };
+
+        var templateFiles = _templateEngine.GetTemplateFiles(templateFolder).ToList();
+
+        if (templateFiles.Count == 0)
+        {
+            _logger.LogWarning("前端模板文件夹为空: {Folder}", templateFolder);
+            throw new InvalidOperationException($"No templates found in folder: {templateFolder}");
+        }
+
+        foreach (var templateFile in templateFiles)
+        {
+            var renderedContent = await _templateEngine.RenderAsync(templateFile, context);
+            var outputPath = ProcessOutputPath(templateFile, context, templateFolder);
+
+            var entry = archive.CreateEntry(outputPath);
+            await using var entryStream = entry.Open();
+            await using var writer = new StreamWriter(entryStream);
+            await writer.WriteAsync(renderedContent);
+        }
+    }
+
+    private async Task GenerateFullstackAsync(ZipArchive archive, GenerateProjectRequest request, object context)
+    {
+        // 生成后端到 apps/api 目录
+        var backendFolder = request.ArchitectureType switch
+        {
+            ArchitectureType.Layered => "layered",
+            ArchitectureType.Clean => "clean",
+            ArchitectureType.Simple => "simple",
+            _ => "layered"
+        };
+
+        var backendFiles = _templateEngine.GetTemplateFiles(backendFolder).ToList();
+        foreach (var templateFile in backendFiles)
+        {
+            var renderedContent = await _templateEngine.RenderAsync(templateFile, context);
+            var outputPath = "apps/api/" + ProcessOutputPath(templateFile, context, backendFolder);
+
+            var entry = archive.CreateEntry(outputPath);
+            await using var entryStream = entry.Open();
+            await using var writer = new StreamWriter(entryStream);
+            await writer.WriteAsync(renderedContent);
+        }
+
+        // 生成前端到 apps/web 目录
+        var frontendFolder = request.FrontendFramework switch
+        {
+            FrontendFramework.VueArco => "frontend/vue-arco",
+            FrontendFramework.VueElement => "frontend/vue-element",
+            FrontendFramework.ReactAntd => "frontend/react-antd",
+            _ => "frontend/vue-arco"
+        };
+
+        var frontendFiles = _templateEngine.GetTemplateFiles(frontendFolder).ToList();
+        foreach (var templateFile in frontendFiles)
+        {
+            var renderedContent = await _templateEngine.RenderAsync(templateFile, context);
+            var outputPath = "apps/web/" + ProcessOutputPath(templateFile, context, frontendFolder);
+
+            var entry = archive.CreateEntry(outputPath);
+            await using var entryStream = entry.Open();
+            await using var writer = new StreamWriter(entryStream);
+            await writer.WriteAsync(renderedContent);
+        }
+
+        // 添加全栈共享文件 (docker-compose, CI/CD, README 等)
+        var fullstackFiles = _templateEngine.GetTemplateFiles("fullstack").ToList();
+        foreach (var templateFile in fullstackFiles)
+        {
+            var renderedContent = await _templateEngine.RenderAsync(templateFile, context);
+            var outputPath = ProcessOutputPath(templateFile, context, "fullstack");
+
+            var entry = archive.CreateEntry(outputPath);
+            await using var entryStream = entry.Open();
+            await using var writer = new StreamWriter(entryStream);
+            await writer.WriteAsync(renderedContent);
+        }
+    }
+
     private object BuildTemplateContext(GenerateProjectRequest request)
     {
         var fullNamespace = string.IsNullOrEmpty(request.NamespacePrefix)
             ? request.ProjectName
             : $"{request.NamespacePrefix}.{request.ProjectName}";
+
+        var appTitle = string.IsNullOrEmpty(request.Frontend.AppTitle)
+            ? request.ProjectName
+            : request.Frontend.AppTitle;
 
         return new
         {
@@ -129,12 +232,13 @@ public class ProjectGeneratorService : IProjectGeneratorService
             @namespace = fullNamespace,
             namespace_prefix = request.NamespacePrefix ?? "",
             dotnet_version = request.DotNetVersion.ToFrameworkMoniker(),
-            database_type = request.Database.Type.ToString(),
+            database_type = request.Database.Type.ToString().ToLower(),
             connection_string = request.Database.ConnectionStringTemplate.Replace(
                 "{database}",
                 $"{request.ProjectName.ToLower()}_db"
             ),
             service_port = request.ServicePort,
+            frontend_port = request.FrontendPort,
 
             // 模块标志
             use_identity = request.Modules.Contains("identity"),
@@ -152,6 +256,14 @@ public class ProjectGeneratorService : IProjectGeneratorService
             include_github_actions = request.Features.IncludeGitHubActions,
             include_swagger = request.Features.IncludeSwagger,
             include_healthchecks = request.Features.IncludeHealthChecks,
+            use_redis = request.Features.UseRedis,
+            use_signalr = request.Features.UseSignalR,
+            use_openiddict = request.Features.UseOpenIddict,
+
+            // 前端配置
+            use_echarts = request.Frontend.UseECharts,
+            api_url = request.Frontend.ApiBaseUrl,
+            app_title = appTitle,
 
             // 辅助变量
             year = DateTime.UtcNow.Year,

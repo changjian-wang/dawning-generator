@@ -1,0 +1,145 @@
+<template>
+  <div class="login-container">
+    <div class="login-box">
+      <div class="login-header">
+        <h1>{{ project_name }}</h1>
+        <p>Welcome back, please login to continue</p>
+      </div>
+      
+      <a-form
+        ref="formRef"
+        :model="form"
+        :rules="rules"
+        layout="vertical"
+        @submit-success="handleSubmit"
+      >
+        <a-form-item field="username" label="Username">
+          <a-input
+            v-model="form.username"
+            placeholder="Please enter username"
+            allow-clear
+          >
+            <template #prefix>
+              <icon-user />
+            </template>
+          </a-input>
+        </a-form-item>
+        
+        <a-form-item field="password" label="Password">
+          <a-input-password
+            v-model="form.password"
+            placeholder="Please enter password"
+            allow-clear
+          >
+            <template #prefix>
+              <icon-lock />
+            </template>
+          </a-input-password>
+        </a-form-item>
+        
+        <a-form-item>
+          <a-checkbox v-model="rememberMe">Remember me</a-checkbox>
+        </a-form-item>
+        
+        <a-form-item>
+          <a-button
+            type="primary"
+            html-type="submit"
+            long
+            :loading="loading"
+          >
+            Login
+          </a-button>
+        </a-form-item>
+      </a-form>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, reactive } from 'vue';
+import { useRouter } from 'vue-router';
+import { Message } from '@arco-design/web-vue';
+import { useUserStore } from '@/store/user';
+
+const router = useRouter();
+const userStore = useUserStore();
+
+const loading = ref(false);
+const rememberMe = ref(false);
+
+const form = reactive({
+  username: '',
+  password: '',
+});
+
+const rules = {
+  username: [
+    { required: true, message: 'Please enter username' },
+  ],
+  password: [
+    { required: true, message: 'Please enter password' },
+    { minLength: 6, message: 'Password must be at least 6 characters' },
+  ],
+};
+
+const handleSubmit = async () => {
+  loading.value = true;
+  try {
+    // TODO: Replace with actual login API
+    // const response = await loginApi(form);
+    
+    // Mock login for demo
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    userStore.setToken('mock-token-' + Date.now());
+    userStore.setUserInfo({
+      id: '1',
+      name: form.username,
+      email: `${form.username}@example.com`,
+      roles: ['admin'],
+    });
+    
+    Message.success('Login successful');
+    router.push('/');
+  } catch (error) {
+    Message.error('Login failed');
+  } finally {
+    loading.value = false;
+  }
+};
+</script>
+
+<style scoped lang="less">
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.login-box {
+  width: 400px;
+  padding: 40px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 32px;
+  
+  h1 {
+    font-size: 28px;
+    color: #1d2129;
+    margin-bottom: 8px;
+  }
+  
+  p {
+    color: #86909c;
+    font-size: 14px;
+  }
+}
+</style>

@@ -12,11 +12,28 @@
   </ItemGroup>
 
   <ItemGroup>
-{{ if use_dapper }}    <PackageReference Include="Dapper" Version="2.1.35" />{{ end }}
-{{ if database_type == "mysql" }}    <PackageReference Include="MySqlConnector" Version="2.3.7" />{{ end }}
-{{ if database_type == "postgresql" }}    <PackageReference Include="Npgsql" Version="8.0.1" />{{ end }}
-{{ if database_type == "sqlserver" }}    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.4" />{{ end }}
-{{ if database_type == "sqlite" }}    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0" />{{ end }}
+    <!-- ORM -->
+{{ if use_dapper }}    <PackageReference Include="Dapper" Version="2.1.35" />
+    <PackageReference Include="Dawning.ORM.Dapper" Version="1.0.1" />{{ end }}
+{{ if use_efcore }}    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>{{ end }}
+    <!-- Database Drivers -->
+{{ if database_type == "mysql" }}    <PackageReference Include="MySqlConnector" Version="2.3.7" />{{ if use_efcore }}
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.0" />{{ end }}{{ end }}
+{{ if database_type == "postgresql" }}    <PackageReference Include="Npgsql" Version="8.0.1" />{{ if use_efcore }}
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />{{ end }}{{ end }}
+{{ if database_type == "sqlserver" }}    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.4" />{{ if use_efcore }}
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />{{ end }}{{ end }}
+{{ if database_type == "sqlite" }}    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0" />{{ if use_efcore }}
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />{{ end }}{{ end }}
+    <!-- Redis -->
+{{ if use_redis }}    <PackageReference Include="StackExchange.Redis" Version="2.7.33" />{{ end }}
+    <!-- Messaging -->
+{{ if use_rabbitmq }}    <PackageReference Include="RabbitMQ.Client" Version="6.8.1" />{{ end }}
+    <!-- DI -->
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
   </ItemGroup>

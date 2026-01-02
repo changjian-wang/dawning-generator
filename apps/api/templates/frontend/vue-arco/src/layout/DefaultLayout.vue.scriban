@@ -1,0 +1,238 @@
+<template>
+  <a-layout class="layout">
+    <a-layout-sider
+      v-model:collapsed="collapsed"
+      collapsible
+      :width="220"
+      :collapsed-width="60"
+      breakpoint="lg"
+    >
+      <div class="logo">
+        <h1 v-if="!collapsed">{{ project_name }}</h1>
+        <span v-else>{{ project_name | string.slice 0 1 }}</span>
+      </div>
+      
+      <a-menu
+        v-model:selected-keys="selectedKeys"
+        :collapsed="collapsed"
+        :auto-open-selected="true"
+        :style="{ width: '100%' }"
+        @menu-item-click="handleMenuClick"
+      >
+        <a-menu-item key="dashboard">
+          <template #icon>
+            <icon-dashboard />
+          </template>
+          Dashboard
+        </a-menu-item>
+        
+        <a-sub-menu key="system">
+          <template #icon>
+            <icon-settings />
+          </template>
+          <template #title>System</template>
+          <a-menu-item key="users">Users</a-menu-item>
+          <a-menu-item key="roles">Roles</a-menu-item>
+          <a-menu-item key="permissions">Permissions</a-menu-item>
+        </a-sub-menu>
+        
+        <a-menu-item key="settings">
+          <template #icon>
+            <icon-tool />
+          </template>
+          Settings
+        </a-menu-item>
+      </a-menu>
+    </a-layout-sider>
+    
+    <a-layout>
+      <a-layout-header class="header">
+        <div class="header-left">
+          <a-button
+            type="text"
+            @click="collapsed = !collapsed"
+          >
+            <template #icon>
+              <icon-menu-fold v-if="!collapsed" />
+              <icon-menu-unfold v-else />
+            </template>
+          </a-button>
+          
+          <a-breadcrumb class="breadcrumb">
+            <a-breadcrumb-item>Home</a-breadcrumb-item>
+            <a-breadcrumb-item>{{ currentPage }}</a-breadcrumb-item>
+          </a-breadcrumb>
+        </div>
+        
+        <div class="header-right">
+          <a-dropdown trigger="click">
+            <a-button type="text">
+              <a-avatar :size="28">
+                <icon-user />
+              </a-avatar>
+              <span class="username">{{ userStore.userInfo?.name || 'User' }}</span>
+            </a-button>
+            <template #content>
+              <a-doption @click="handleProfile">
+                <icon-user /> Profile
+              </a-doption>
+              <a-doption @click="handleSettings">
+                <icon-settings /> Settings
+              </a-doption>
+              <a-divider :margin="4" />
+              <a-doption @click="handleLogout">
+                <icon-export /> Logout
+              </a-doption>
+            </template>
+          </a-dropdown>
+        </div>
+      </a-layout-header>
+      
+      <a-layout-content class="content">
+        <router-view v-slot="{ Component }">
+          <transition name="fade" mode="out-in">
+            <component :is="Component" />
+          </transition>
+        </router-view>
+      </a-layout-content>
+      
+      <a-layout-footer class="footer">
+        {{ project_name }} © {{ "{{ new Date().getFullYear() }}" }}
+      </a-layout-footer>
+    </a-layout>
+  </a-layout>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { Modal } from '@arco-design/web-vue';
+import { useUserStore } from '@/store/user';
+
+const router = useRouter();
+const route = useRoute();
+const userStore = useUserStore();
+
+const collapsed = ref(false);
+const selectedKeys = ref<string[]>(['dashboard']);
+
+const currentPage = computed(() => {
+  return route.meta?.title || route.name || 'Dashboard';
+});
+
+const handleMenuClick = (key: string) => {
+  const routes: Record<string, string> = {
+    dashboard: '/',
+    users: '/system/users',
+    roles: '/system/roles',
+    permissions: '/system/permissions',
+    settings: '/settings',
+  };
+  
+  if (routes[key]) {
+    router.push(routes[key]);
+  }
+};
+
+const handleProfile = () => {
+  router.push('/profile');
+};
+
+const handleSettings = () => {
+  router.push('/settings');
+};
+
+const handleLogout = () => {
+  Modal.confirm({
+    title: 'Confirm Logout',
+    content: 'Are you sure you want to logout?',
+    onOk: () => {
+      userStore.logout();
+      router.push('/login');
+    },
+  });
+};
+</script>
+
+<style scoped lang="less">
+.layout {
+  min-height: 100vh;
+}
+
+.logo {
+  height: 64px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  
+  h1 {
+    color: #fff;
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  span {
+    color: #fff;
+    font-size: 20px;
+    font-weight: 600;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.breadcrumb {
+  margin-left: 16px;
+}
+
+.username {
+  margin-left: 8px;
+}
+
+.content {
+  margin: 16px;
+  padding: 16px;
+  background: #fff;
+  border-radius: 4px;
+  min-height: calc(100vh - 200px);
+}
+
+.footer {
+  text-align: center;
+  color: #86909c;
+  padding: 16px;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

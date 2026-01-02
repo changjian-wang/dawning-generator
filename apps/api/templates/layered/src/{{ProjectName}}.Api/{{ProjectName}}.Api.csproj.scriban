@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>{{ full_namespace }}.Api</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,11 +15,28 @@
   </ItemGroup>
 
   <ItemGroup>
-{{ if include_swagger }}    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />{{ end }}
+    <!-- Swagger -->
+{{ if include_swagger }}    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.9.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.1.0" />{{ end }}
+    <!-- Logging -->
+{{ if use_logging }}    <PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="5.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />{{ end }}
+    <!-- Redis Cache -->
+{{ if use_redis }}    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.11" />{{ end }}
+    <!-- SignalR -->
+{{ if use_signalr }}    <PackageReference Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="8.0.11" />{{ end }}
+    <!-- OpenIddict -->
+{{ if use_openiddict }}    <PackageReference Include="OpenIddict.AspNetCore" Version="5.8.0" />
+    <PackageReference Include="OpenIddict.Core" Version="5.8.0" />
+    <PackageReference Include="OpenIddict.Server.AspNetCore" Version="5.8.0" />{{ end }}
+    <!-- Dawning SDK -->
 {{ if use_identity }}    <PackageReference Include="Dawning.Identity" Version="1.2.0" />{{ end }}
 {{ if use_core }}    <PackageReference Include="Dawning.Core" Version="1.2.0" />{{ end }}
-{{ if use_logging }}    <PackageReference Include="Dawning.Logging" Version="1.2.0" />{{ end }}
-{{ if include_health_checks }}    <PackageReference Include="AspNetCore.HealthChecks.MySql" Version="8.0.1" />{{ end }}
+    <!-- Health Checks -->
+{{ if include_health_checks }}    <PackageReference Include="AspNetCore.HealthChecks.MySql" Version="8.0.1" />
+    <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="8.0.1" />{{ end }}
   </ItemGroup>
 
 </Project>

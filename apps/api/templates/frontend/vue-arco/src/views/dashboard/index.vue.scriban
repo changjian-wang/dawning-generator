@@ -1,0 +1,186 @@
+<template>
+  <div class="dashboard-container">
+    <a-row :gutter="16">
+      <a-col :span="6">
+        <a-card class="stat-card">
+          <a-statistic title="Total Users" :value="statistics.users">
+            <template #prefix>
+              <icon-user />
+            </template>
+          </a-statistic>
+        </a-card>
+      </a-col>
+      <a-col :span="6">
+        <a-card class="stat-card">
+          <a-statistic title="Total Orders" :value="statistics.orders">
+            <template #prefix>
+              <icon-file />
+            </template>
+          </a-statistic>
+        </a-card>
+      </a-col>
+      <a-col :span="6">
+        <a-card class="stat-card">
+          <a-statistic title="Total Revenue" :value="statistics.revenue" :precision="2">
+            <template #prefix>
+              <icon-trophy />
+            </template>
+            <template #suffix>
+              <span class="unit">$</span>
+            </template>
+          </a-statistic>
+        </a-card>
+      </a-col>
+      <a-col :span="6">
+        <a-card class="stat-card">
+          <a-statistic title="Conversion Rate" :value="statistics.conversionRate" :precision="2">
+            <template #suffix>%</template>
+          </a-statistic>
+        </a-card>
+      </a-col>
+    </a-row>
+    
+    <a-row :gutter="16" class="mt-4">
+      <a-col :span="16">
+        <a-card title="Overview">
+          <div ref="chartRef" class="chart-container"></div>
+        </a-card>
+      </a-col>
+      <a-col :span="8">
+        <a-card title="Recent Activities">
+          <a-list :data="activities" :bordered="false">
+            <template #item="{ item }">
+              <a-list-item>
+                <a-list-item-meta
+                  :title="item.title"
+                  :description="item.time"
+                >
+                  <template #avatar>
+                    <a-avatar :style="{ backgroundColor: item.color }">
+                      <component :is="item.icon" />
+                    </a-avatar>
+                  </template>
+                </a-list-item-meta>
+              </a-list-item>
+            </template>
+          </a-list>
+        </a-card>
+      </a-col>
+    </a-row>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, reactive, onMounted } from 'vue';
+{{~ if use_echarts ~}}
+import * as echarts from 'echarts';
+{{~ end ~}}
+
+const chartRef = ref<HTMLElement>();
+
+const statistics = reactive({
+  users: 1234,
+  orders: 5678,
+  revenue: 98765.43,
+  conversionRate: 12.5,
+});
+
+const activities = ref([
+  {
+    title: 'New user registered',
+    time: '2 minutes ago',
+    icon: 'icon-user-add',
+    color: '#165DFF',
+  },
+  {
+    title: 'Order #1234 completed',
+    time: '15 minutes ago',
+    icon: 'icon-check-circle',
+    color: '#00B42A',
+  },
+  {
+    title: 'System update completed',
+    time: '1 hour ago',
+    icon: 'icon-settings',
+    color: '#722ED1',
+  },
+  {
+    title: 'New comment received',
+    time: '2 hours ago',
+    icon: 'icon-message',
+    color: '#F77234',
+  },
+]);
+
+onMounted(() => {
+  initChart();
+});
+
+const initChart = () => {
+{{~ if use_echarts ~}}
+  if (!chartRef.value) return;
+  
+  const chart = echarts.init(chartRef.value);
+  
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+    },
+    legend: {
+      data: ['Users', 'Orders'],
+    },
+    xAxis: {
+      type: 'category',
+      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    },
+    yAxis: {
+      type: 'value',
+    },
+    series: [
+      {
+        name: 'Users',
+        type: 'line',
+        smooth: true,
+        data: [120, 132, 101, 134, 90, 230, 210],
+      },
+      {
+        name: 'Orders',
+        type: 'bar',
+        data: [220, 182, 191, 234, 290, 330, 310],
+      },
+    ],
+  };
+  
+  chart.setOption(option);
+  
+  window.addEventListener('resize', () => {
+    chart.resize();
+  });
+{{~ else ~}}
+  console.log('ECharts not enabled');
+{{~ end ~}}
+};
+</script>
+
+<style scoped lang="less">
+.dashboard-container {
+  padding: 16px;
+}
+
+.stat-card {
+  text-align: center;
+}
+
+.mt-4 {
+  margin-top: 16px;
+}
+
+.chart-container {
+  height: 400px;
+}
+
+.unit {
+  font-size: 14px;
+  color: #86909c;
+}
+</style>

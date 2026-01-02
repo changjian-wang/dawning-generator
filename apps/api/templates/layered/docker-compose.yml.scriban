@@ -1,0 +1,73 @@
+name: {{ project_name | string.downcase }}
+
+services:
+  # API Backend
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "{{ service_port }}:{{ service_port }}"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:{{ service_port }}
+{{ if database_type == "mysql" }}      - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database={{ project_name | string.downcase }};User=root;Password=root123;{{ end }}
+{{ if database_type == "postgresql" }}      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database={{ project_name | string.downcase }};Username=postgres;Password=postgres123;{{ end }}
+{{ if use_redis }}      - ConnectionStrings__Redis=redis:6379{{ end }}
+    depends_on:
+{{ if database_type == "mysql" }}      - mysql{{ end }}
+{{ if database_type == "postgresql" }}      - postgres{{ end }}
+{{ if use_redis }}      - redis{{ end }}
+    networks:
+      - {{ project_name | string.downcase }}-network
+
+{{ if database_type == "mysql" }}
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root123
+      - MYSQL_DATABASE={{ project_name | string.downcase }}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - {{ project_name | string.downcase }}-network
+{{ end }}
+
+{{ if database_type == "postgresql" }}
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=postgres123
+      - POSTGRES_DB={{ project_name | string.downcase }}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - {{ project_name | string.downcase }}-network
+{{ end }}
+
+{{ if use_redis }}
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - {{ project_name | string.downcase }}-network
+{{ end }}
+
+networks:
+  {{ project_name | string.downcase }}-network:
+    driver: bridge
+
+volumes:
+{{ if database_type == "mysql" }}  mysql_data:{{ end }}
+{{ if database_type == "postgresql" }}  postgres_data:{{ end }}
+{{ if use_redis }}  redis_data:{{ end }}

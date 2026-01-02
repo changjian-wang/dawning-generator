@@ -12,6 +12,12 @@ public class TemplateService : ITemplateService
     {
         return new TemplateOptionsDto
         {
+            ProjectTypes =
+            [
+                new OptionItem { Value = "backend", Label = "后端项目 (API)", IsDefault = true },
+                new OptionItem { Value = "frontend", Label = "前端项目 (Web)", IsDefault = false },
+                new OptionItem { Value = "fullstack", Label = "全栈项目 (API + Web)", IsDefault = false }
+            ],
             DotNetVersions =
             [
                 new OptionItem { Value = "net8", Label = ".NET 8.0 (LTS)", IsDefault = true },
@@ -21,6 +27,12 @@ public class TemplateService : ITemplateService
             [
                 new OptionItem { Value = "layered", Label = "分层架构", IsDefault = true },
                 new OptionItem { Value = "simple", Label = "简单架构", IsDefault = false }
+            ],
+            FrontendFrameworks =
+            [
+                new OptionItem { Value = "vue-arco", Label = "Vue 3 + Arco Design", IsDefault = true },
+                new OptionItem { Value = "vue-element", Label = "Vue 3 + Element Plus", IsDefault = false },
+                new OptionItem { Value = "react-antd", Label = "React + Ant Design", IsDefault = false }
             ],
             DatabaseTypes =
             [
@@ -131,6 +143,34 @@ public class TemplateService : ITemplateService
                     Name = "GitHub Actions",
                     Description = "CI/CD 工作流",
                     IsDefault = false
+                },
+                new FeatureItem
+                {
+                    Id = "redis",
+                    Name = "Redis 缓存",
+                    Description = "分布式缓存支持",
+                    IsDefault = false
+                },
+                new FeatureItem
+                {
+                    Id = "signalr",
+                    Name = "SignalR",
+                    Description = "实时通信支持",
+                    IsDefault = false
+                },
+                new FeatureItem
+                {
+                    Id = "openiddict",
+                    Name = "OpenIddict",
+                    Description = "OAuth 2.0 认证服务器",
+                    IsDefault = false
+                },
+                new FeatureItem
+                {
+                    Id = "echarts",
+                    Name = "ECharts 图表",
+                    Description = "前端图表库 (仅前端/全栈)",
+                    IsDefault = true
                 }
             ]
         };

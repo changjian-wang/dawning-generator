@@ -8,6 +8,11 @@ namespace Dawning.Generator.Application.Dtos;
 public class TemplateOptionsDto
 {
     /// <summary>
+    /// 项目类型选项
+    /// </summary>
+    public List<OptionItem> ProjectTypes { get; set; } = [];
+    
+    /// <summary>
     /// .NET 版本选项
     /// </summary>
     public List<OptionItem> DotNetVersions { get; set; } = [];
@@ -16,6 +21,11 @@ public class TemplateOptionsDto
     /// 架构类型选项
     /// </summary>
     public List<OptionItem> ArchitectureTypes { get; set; } = [];
+    
+    /// <summary>
+    /// 前端框架选项
+    /// </summary>
+    public List<OptionItem> FrontendFrameworks { get; set; } = [];
     
     /// <summary>
     /// 数据库类型选项

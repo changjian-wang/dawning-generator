@@ -1,0 +1,99 @@
+# {{ project_name }}
+
+全栈应用项目，包含后端 API 和前端 Web 应用。
+
+## 项目结构
+
+```
+{{ project_name | string.downcase }}/
+├── apps/
+│   ├── api/              # .NET 8 后端 API
+│   │   ├── src/          # 源代码
+│   │   └── Dockerfile
+│   └── web/              # Vue 3 前端应用
+│       ├── src/          # 源代码
+│       └── Dockerfile
+├── deploy/
+│   └── docker/           # Docker 部署配置
+│       └── docker-compose.yml
+├── scripts/              # 辅助脚本
+└── README.md
+```
+
+## 技术栈
+
+### 后端
+- .NET 8
+- Entity Framework Core
+{{~ if use_dapper ~}}
+- Dapper
+{{~ end ~}}
+{{~ if use_redis ~}}
+- Redis 缓存
+{{~ end ~}}
+{{~ if use_signalr ~}}
+- SignalR 实时通信
+{{~ end ~}}
+- Serilog 日志
+- OpenIddict 认证
+
+### 前端
+- Vue 3 (Composition API)
+- TypeScript
+- Vite
+- Arco Design Vue
+- Pinia 状态管理
+- Vue Router 4
+{{~ if use_echarts ~}}
+- ECharts 图表
+{{~ end ~}}
+
+## 快速开始
+
+### 开发环境
+
+1. **启动后端**
+   ```bash
+   cd apps/api
+   dotnet restore
+   dotnet run
+   ```
+
+2. **启动前端**
+   ```bash
+   cd apps/web
+   pnpm install
+   pnpm dev
+   ```
+
+### Docker 部署
+
+```bash
+cd deploy/docker
+docker-compose up -d
+```
+
+访问地址:
+- 前端: http://localhost:3000
+- API: http://localhost:5000
+- API 文档: http://localhost:5000/swagger
+
+## 配置
+
+### 后端配置 (appsettings.json)
+
+- `ConnectionStrings:DefaultConnection` - 数据库连接字符串
+{{~ if use_redis ~}}
+- `ConnectionStrings:Redis` - Redis 连接字符串
+{{~ end ~}}
+- `Jwt:Secret` - JWT 密钥
+- `Cors:Origins` - 允许的跨域来源
+
+### 前端配置 (.env)
+
+- `VITE_API_BASE_URL` - API 基础路径
+- `VITE_APP_TITLE` - 应用标题
+
+## License
+
+MIT

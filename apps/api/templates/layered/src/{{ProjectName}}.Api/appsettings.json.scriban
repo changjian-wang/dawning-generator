@@ -5,6 +5,17 @@
       "Microsoft.AspNetCore": "Warning"
     }
   },
+{{ if use_logging }}
+  "Serilog": {
+    "MinimumLevel": {
+      "Default": "Information",
+      "Override": {
+        "Microsoft": "Warning",
+        "System": "Warning"
+      }
+    }
+  },
+{{ end }}
   "AllowedHosts": "*",
 {{ if use_identity }}
   "DawningAuth": {
@@ -14,8 +25,14 @@
   },
 {{ end }}
   "ConnectionStrings": {
-    "DefaultConnection": "{{ connection_string }}"
+    "DefaultConnection": "{{ connection_string }}"{{ if use_redis }},
+    "Redis": "localhost:6379"{{ end }}
   },
+{{ if use_signalr }}
+  "SignalR": {
+    "EnableDetailedErrors": true
+  },
+{{ end }}
   "Kestrel": {
     "Endpoints": {
       "Http": {

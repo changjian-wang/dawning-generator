@@ -1,0 +1,56 @@
+# =============================================
+# {{ project_name }} API - Multi-stage Dockerfile
+# =============================================
+
+# ===== Build Stage =====
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Copy solution and project files
+COPY ["{{ project_name }}.sln", "./"]
+COPY ["src/{{ project_name }}.Api/{{ project_name }}.Api.csproj", "src/{{ project_name }}.Api/"]
+COPY ["src/{{ project_name }}.Application/{{ project_name }}.Application.csproj", "src/{{ project_name }}.Application/"]
+COPY ["src/{{ project_name }}.Domain/{{ project_name }}.Domain.csproj", "src/{{ project_name }}.Domain/"]
+COPY ["src/{{ project_name }}.Infrastructure/{{ project_name }}.Infrastructure.csproj", "src/{{ project_name }}.Infrastructure/"]
+
+# Restore dependencies
+RUN dotnet restore "src/{{ project_name }}.Api/{{ project_name }}.Api.csproj"
+
+# Copy all source code
+COPY . .
+
+# Build the application
+WORKDIR "/src/src/{{ project_name }}.Api"
+RUN dotnet build "{{ project_name }}.Api.csproj" -c Release -o /app/build
+
+# ===== Publish Stage =====
+FROM build AS publish
+RUN dotnet publish "{{ project_name }}.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+# ===== Runtime Stage =====
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+
+# Create non-root user for security
+RUN groupadd -r {{ project_name | string.downcase }} && useradd -r -g {{ project_name | string.downcase }} {{ project_name | string.downcase }}
+
+# Copy published application
+COPY --from=publish /app/publish .
+
+# Create logs directory
+RUN mkdir -p /app/Logs && chown -R {{ project_name | string.downcase }}:{{ project_name | string.downcase }} /app
+
+# Switch to non-root user
+USER {{ project_name | string.downcase }}
+
+# Expose ports
+EXPOSE {{ service_port }}
+
+# Set environment variables
+ENV ASPNETCORE_URLS=http://+:{{ service_port }}
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:{{ service_port }}/api/health || exit 1
+
+ENTRYPOINT ["dotnet", "{{ project_name }}.Api.dll"]
