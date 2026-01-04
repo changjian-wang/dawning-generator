@@ -3,17 +3,7 @@
     <a-layout-header class="header">
       <div class="header-content">
         <div class="left-side" @click="$router.push('/')">
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" class="logo-svg">
-            <defs>
-              <linearGradient id="arrowGradient" x1="16" y1="2" x2="16" y2="30" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stop-color="#165DFF"/>
-                <stop offset="100%" stop-color="#6AA1FF"/>
-              </linearGradient>
-            </defs>
-            <path d="M16 2 L28 28 L20 28 L16 18 L12 28 L4 28 Z" fill="url(#arrowGradient)"/>
-            <path d="M16 12 L13 20 L16 20 L19 20 Z" fill="white"/>
-          </svg>
-          <span class="brand-title">Dawning Generator</span>
+          <img :src="logoUrl" alt="Dawning Generator" class="logo-img" />
         </div>
 
         <div class="center-side">
@@ -104,6 +94,7 @@ import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { LOCALE_OPTIONS } from '@/locale'
+import logoUrl from '@/assets/images/logo-full.svg'
 
 const router = useRouter()
 const route = useRoute()
@@ -178,20 +169,10 @@ const openDocs = () => {
   opacity: 0.85;
 }
 
-.logo-svg {
+.logo-img {
+  height: 40px;
+  width: auto;
   flex-shrink: 0;
-}
-
-.brand-title {
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  font-family: 'Poppins', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: linear-gradient(135deg, #165DFF 0%, #4080FF 50%, #6AA1FF 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  white-space: nowrap;
 }
 
 .center-side {
@@ -320,8 +301,8 @@ const openDocs = () => {
     padding: 0 16px;
   }
 
-  .brand-title {
-    font-size: 16px;
+  .logo-img {
+    height: 32px;
   }
 
   .center-side {

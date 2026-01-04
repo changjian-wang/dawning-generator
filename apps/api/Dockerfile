@@ -41,8 +41,9 @@ RUN groupadd -r dawning && useradd -r -g dawning dawning
 # Copy published application
 COPY --from=publish /app/publish .
 
-# Copy templates
+# Copy templates from both locations
 COPY --from=build /src/templates ./templates
+COPY --from=build /src/src/templates ./templates
 
 # Create logs directory
 RUN mkdir -p /app/Logs && chown -R dawning:dawning /app

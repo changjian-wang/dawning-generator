@@ -39,5 +39,6 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Build Docker image
-      run: docker build -t {{ project_name | string.downcase }}:${{ "{{" }} github.sha {{ "}}" }} .
+      run: docker build -t {{ project_name | string.downcase }}:{%{github.sha}%} .
 {{ end }}
+

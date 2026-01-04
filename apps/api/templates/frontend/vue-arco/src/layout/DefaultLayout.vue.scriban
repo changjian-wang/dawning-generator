@@ -60,7 +60,7 @@
           
           <a-breadcrumb class="breadcrumb">
             <a-breadcrumb-item>Home</a-breadcrumb-item>
-            <a-breadcrumb-item>{{ currentPage }}</a-breadcrumb-item>
+            <a-breadcrumb-item>{%{ currentPage }%}</a-breadcrumb-item>
           </a-breadcrumb>
         </div>
         
@@ -70,7 +70,7 @@
               <a-avatar :size="28">
                 <icon-user />
               </a-avatar>
-              <span class="username">{{ userStore.userInfo?.name || 'User' }}</span>
+              <span class="username">{%{ userStore.userInfo?.name || 'User' }%}</span>
             </a-button>
             <template #content>
               <a-doption @click="handleProfile">
@@ -97,7 +97,7 @@
       </a-layout-content>
       
       <a-layout-footer class="footer">
-        {{ project_name }} © {{ "{{ new Date().getFullYear() }}" }}
+        {{ project_name }} © {%{ new Date().getFullYear() }%}
       </a-layout-footer>
     </a-layout>
   </a-layout>

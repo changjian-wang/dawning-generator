@@ -58,6 +58,12 @@
               required
             >
               <a-radio-group v-model="formData.architectureType" direction="vertical" class="arch-radio-group">
+                <a-radio value="Clean">
+                  <div class="arch-radio-content">
+                    <span class="arch-label">{{ $t('generator.architectureType.clean') }}</span>
+                    <span class="arch-desc">{{ $t('generator.architectureType.cleanDesc') }}</span>
+                  </div>
+                </a-radio>
                 <a-radio value="Layered">
                   <div class="arch-radio-content">
                     <span class="arch-label">{{ $t('generator.architectureType.layered') }}</span>
@@ -252,7 +258,7 @@ const formData = reactive<GenerateProjectRequest>({
   projectName: '',
   namespacePrefix: '',
   projectType: 'Backend',
-  architectureType: 'Layered',
+  architectureType: 'Clean',
   frontendFramework: 'VueArco',
   dotNetVersion: 'Net8',
   databaseType: 'MySQL',
@@ -306,7 +312,7 @@ const handleReset = () => {
   formData.projectName = ''
   formData.namespacePrefix = ''
   formData.projectType = 'Backend'
-  formData.architectureType = 'Layered'
+  formData.architectureType = 'Clean'
   formData.frontendFramework = 'VueArco'
   formData.dotNetVersion = 'Net8'
   formData.databaseType = 'MySQL'
