@@ -93,12 +93,13 @@ app.UseSerilogRequestLogging();
 {{ end }}
 
 {{ if include_swagger }}
-// Swagger (only in Development)
-if (app.Environment.IsDevelopment())
+// Swagger
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "{{ project_name }} API v1");
+    c.RoutePrefix = string.Empty; // Swagger at root URL
+});
 {{ end }}
 
 {{ if use_core }}app.UseDawningExceptionHandler();{{ end }}

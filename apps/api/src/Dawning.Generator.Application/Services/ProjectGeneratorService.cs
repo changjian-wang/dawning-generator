@@ -217,18 +217,22 @@ public class ProjectGeneratorService : IProjectGeneratorService
 
     private object BuildTemplateContext(GenerateProjectRequest request)
     {
+        // 将项目名称转换为 PascalCase (如 dawning.store -> Dawning.Store)
+        var pascalProjectName = ToPascalCase(request.ProjectName);
+        
         var fullNamespace = string.IsNullOrEmpty(request.NamespacePrefix)
-            ? request.ProjectName
-            : $"{request.NamespacePrefix}.{request.ProjectName}";
+            ? pascalProjectName
+            : $"{request.NamespacePrefix}.{pascalProjectName}";
 
         var appTitle = string.IsNullOrEmpty(request.Frontend.AppTitle)
-            ? request.ProjectName
+            ? pascalProjectName
             : request.Frontend.AppTitle;
 
         return new
         {
-            // 用于 Scriban 模板的变量 (snake_case 风格)
-            project_name = request.ProjectName,
+            // 用于 Scriban 模板的变量
+            project_name = pascalProjectName,  // 后端使用 PascalCase
+            project_name_lower = request.ProjectName.ToLower(),  // 前端使用小写
             @namespace = fullNamespace,
             namespace_prefix = request.NamespacePrefix ?? "",
             dotnet_version = request.DotNetVersion.ToFrameworkMoniker(),
@@ -394,5 +398,25 @@ public class ProjectGeneratorService : IProjectGeneratorService
         if (features.IncludeHealthChecks)
             list.Add("healthchecks");
         return list;
+    }
+
+    /// <summary>
+    /// 将字符串转换为 PascalCase (如 dawning.store -> Dawning.Store)
+    /// </summary>
+    private static string ToPascalCase(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+            return input;
+
+        // 按点号分割，每个部分首字母大写
+        var parts = input.Split('.');
+        for (var i = 0; i < parts.Length; i++)
+        {
+            if (!string.IsNullOrEmpty(parts[i]))
+            {
+                parts[i] = char.ToUpper(parts[i][0]) + parts[i][1..].ToLower();
+            }
+        }
+        return string.Join(".", parts);
     }
 }

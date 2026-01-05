@@ -144,6 +144,31 @@
                 <a-option value="SQLite">SQLite</a-option>
               </a-select>
             </a-form-item>
+
+            <a-row :gutter="16" v-if="formData.projectType !== 'Frontend'">
+              <a-col :span="12">
+                <a-form-item field="servicePort" :label="$t('generator.servicePort')">
+                  <a-input-number 
+                    v-model="formData.servicePort" 
+                    :min="1024" 
+                    :max="65535"
+                    :placeholder="$t('generator.servicePortPlaceholder')"
+                    style="width: 100%"
+                  />
+                </a-form-item>
+              </a-col>
+              <a-col :span="12" v-if="formData.projectType === 'Fullstack'">
+                <a-form-item field="frontendPort" :label="$t('generator.frontendPort')">
+                  <a-input-number 
+                    v-model="formData.frontendPort" 
+                    :min="1024" 
+                    :max="65535"
+                    :placeholder="$t('generator.frontendPortPlaceholder')"
+                    style="width: 100%"
+                  />
+                </a-form-item>
+              </a-col>
+            </a-row>
             
             <a-form-item 
               v-if="formData.projectType !== 'Frontend'"

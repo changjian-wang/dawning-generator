@@ -33,13 +33,14 @@ builder.Services.AddHealthChecks();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
 {{~ if include_swagger ~}}
-    app.UseSwagger();
-    app.UseSwaggerUI();
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "{{project_name}} API v1");
+    c.RoutePrefix = string.Empty; // Swagger at root URL
+});
 {{~ end ~}}
-}
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
